@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
+  ActivityIndicator
 } from 'react-native';
 import React, {useState} from 'react';
 
@@ -148,7 +149,7 @@ const FinderRegisterScreen = ({navigation}) => {
             [
               {
                 text: 'OK',
-                onPress: () => navigation.navigate('DonourAndFinderLogin'),
+                onPress: () => navigation.navigate('Login'),
               },
             ],
           );
@@ -241,7 +242,7 @@ const FinderRegisterScreen = ({navigation}) => {
             </Text>
             <Picker
               selectedValue={inputs.district}
-              style={{height: 50, width: '100%', fontFamily: 'outfit'}}
+              style={{height: 50, width: '100%', fontFamily: 'Outfit'}}
               onValueChange={(itemValue, itemIndex) =>
                 handleOnchange(itemValue, 'district')
               }>
@@ -286,7 +287,7 @@ const FinderRegisterScreen = ({navigation}) => {
             />
           )}
           <Text
-            onPress={() => navigation.navigate('DonourAndFinderLogin')}
+            onPress={() => navigation.navigate('Login')}
             style={{
               color: Colours.black,
               fontWeight: 'bold',
