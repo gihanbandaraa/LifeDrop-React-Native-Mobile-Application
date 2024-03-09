@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet } from "react-native";
 import COLORS from "../colours/Colours";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
+
 const Input = ({
   label,
   iconName,
@@ -66,7 +67,7 @@ const style = StyleSheet.create({
     marginVertical: 5,
     fontSize: 14,
     color: COLORS.grey,
-    fontFamily: "outfit",
+    fontFamily: "Outfit",
   },
   inputContainer: {
     height: 55,

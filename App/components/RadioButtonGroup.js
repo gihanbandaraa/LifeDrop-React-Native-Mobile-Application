@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import COLORS from '../Colours/Colours';
+import COLORS from '../colours/Colours';
 
 const RadioButtonGroup = ({ label, options, selectedOption, onSelect, error }) => {
     const halfLength = Math.ceil(options.length / 2);
