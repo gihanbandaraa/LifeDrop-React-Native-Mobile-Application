@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function FinderRegisterScreen() {
+export default function FindDonor() {
   return (
     <View>
-      <Text>FinderRegisterScreen</Text>
+      <Text>FindDonor</Text>
     </View>
   )
 }

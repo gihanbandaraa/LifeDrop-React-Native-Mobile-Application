@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function DonorRegisterScreen() {
+export default function UserAccount() {
   return (
     <View>
-      <Text>DonorRegisterScreen</Text>
+      <Text>UserAccount</Text>
     </View>
   )
 }

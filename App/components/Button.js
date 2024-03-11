@@ -1,6 +1,6 @@
 import React from 'react';
 import {TouchableOpacity, Text} from 'react-native';
-import COLORS from '../../App/Colours/Colours';
+import COLORS from '../colours/Colours';
 const Button = ({title, onPress = () => {}}) => {
   return (
     <TouchableOpacity
