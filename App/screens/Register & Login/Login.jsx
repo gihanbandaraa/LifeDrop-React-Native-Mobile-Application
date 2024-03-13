@@ -22,39 +22,28 @@ const Login = () => {
       .signInWithEmailAndPassword(inputs.email, inputs.password)
       .then(userCredential => {
         const user = userCredential.user;
-
-        firestore
-          .collection('users')
-          .doc(user.uid)
-          .get()
-          .then(doc => {
-            if (doc.exists) {
-              const userData = doc.data();
-              if (userData.isFinder) {
-                AsyncStorage.setItem('userType', 'finder');
-                setLoading(false);
-                AsyncStorage.setItem('loginStatus', 'true');
-                ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
-                navigation.navigate('FinderHomeScreen');
-              } else if (userData.isDonor) {
-                AsyncStorage.setItem('loginStatus', 'true');
-                AsyncStorage.setItem('userType', 'donor');
-                setLoading(false);
-                ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
-                navigation.navigate('DonorHomeScreen');
-              } else {
-                setError('Invalid user type');
-              }
-            } else {
-              setError('User data not found');
-            }
-          })
-          .catch(error => {
-            setError('An error occurred');
-          });
+        return firestore.collection('users').doc(user.uid).get();
+      })
+      .then(doc => {
+        if (doc.exists) {
+          const userData = doc.data();
+          if (userData.isFinder) {
+            AsyncStorage.setItem('userType', 'finder');
+            AsyncStorage.setItem('loginStatus', 'true');
+            navigation.navigate('FinderHomeScreen');
+          } else if (userData.isDonor) {
+            AsyncStorage.setItem('userType', 'donor');
+            AsyncStorage.setItem('loginStatus', 'true');
+            navigation.navigate('DonorHomeScreen');
+          } else {
+            setError('Invalid user type');
+          }
+        } else {
+          setError('User data not found');
+        }
       })
       .catch(error => {
-        setError('Incorrect email or password');
+        setError('An error occurred');
       })
       .finally(() => {
         setLoading(false);

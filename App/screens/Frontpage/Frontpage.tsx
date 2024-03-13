@@ -13,7 +13,7 @@ const FrontPage: React.FC<FrontPageProps> = () => {
   useEffect(() => {
     checkUserTypeAndLoginStatus();
   }, []);
-
+  
   const checkUserTypeAndLoginStatus = async () => {
     try {
       const userType = await AsyncStorage.getItem('userType');

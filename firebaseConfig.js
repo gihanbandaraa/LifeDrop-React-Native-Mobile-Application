@@ -9,14 +9,15 @@ const firebaseConfig = {
     appId: "1:786759662787:web:dc8cae826716fa7aab7676"
   };
 
-let app;
-if(firebase.apps.length===0){
-    app =firebase.initializeApp(firebaseConfig);
-}else{
-    app =firebase.app()
-}
-const auth =firebase.auth()
-const firestore = firebase.firestore();
-
-export { firestore };
-export {auth};
+  let firebaseApp;
+  if (firebase.apps.length === 0) {
+    firebaseApp = firebase.initializeApp(firebaseConfig);
+  } else {
+    firebaseApp = firebase.app();
+  }
+  
+  const auth = firebase.auth();
+  const firestore = firebase.firestore();
+  
+  export { firestore };
+  export { auth };
