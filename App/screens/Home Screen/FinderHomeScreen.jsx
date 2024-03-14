@@ -6,11 +6,31 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Options from '../../components/Options';
+import { useAuth } from '../../hooks/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function FinderHomeScreen() {
+  const { user } = useAuth();
+    // console.log("user is",user)
+
+    // const storeUser = async (userData) => {
+    //   try {
+    //     await AsyncStorage.setItem('user', JSON.stringify(userData));
+    //     console.log('User stored successfully.');
+    //   } catch (error) {
+    //     console.error('Error storing user:', error);
+    //   }
+    // };
+  
+    // Call the function to store user when component mounts
+    // useEffect(() => {
+    //   if (user) {
+    //     storeUser(user);
+    //   }
+    // }, [user]);
   return (
     <SafeAreaView style={{backgroundColor: '#F8F8F8',height:"100%"}}>
       <ScrollView style={styles.container}>

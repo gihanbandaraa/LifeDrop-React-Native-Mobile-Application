@@ -11,8 +11,16 @@ import {
 } from "react-native";
 
 //import Firebase 
-import { auth, firestore } from "../../../firebaseConfig"; 
+import { getAuth } from "firebase/auth";
+import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+import app from '../../../firebaseConfig';
 
+
+const firebaseApp = app;
+
+// Initialize auth and firestore
+const auth = getAuth(firebaseApp);
+const firestore = getFirestore(firebaseApp);
 
 
 //import the components
@@ -22,6 +30,7 @@ import Button from "../../components/Button";
 import RadioButtonGroup from "../../components/RadioButtonGroup";
 
 import { Picker } from "@react-native-picker/picker";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 
 
@@ -134,14 +143,14 @@ const DonorRegisterScreen = ({ navigation }) => {
     const register = () => {
         console.log(auth);
         setLoading(true);
-        auth.createUserWithEmailAndPassword(inputs.email, inputs.password)
+        createUserWithEmailAndPassword(auth,inputs.email, inputs.password)
             .then(async (userCredentials) => {
                 setLoading(false);
                 const user = userCredentials.user;
                 console.log(user.email);
 
                 try {
-                    await firestore.collection("users").doc(user.uid).set({
+                    await setDoc(doc(firestore, "users", user.uid), {
                         email: user.email,
                         fullname: inputs.fullname,
                         phone: inputs.phone,

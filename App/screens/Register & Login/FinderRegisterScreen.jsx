@@ -5,12 +5,13 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import React, {useState} from 'react';
 
-//import Firebase
-import {auth, firestore} from '../../../firebaseConfig';
+import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
+import {getFirestore, collection, doc, setDoc} from 'firebase/firestore';
+import app from '../../../firebaseConfig';
 
 //import the components
 import Colours from '../../colours/Colours';
@@ -64,6 +65,12 @@ const FinderRegisterScreen = ({navigation}) => {
   const [selectedGender, setSelectedGender] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const firebaseApp = app;
+
+  // Initialize auth and firestore
+  const auth = getAuth(app);
+  const firestore = getFirestore(app);
 
   const validate = () => {
     let isValid = true;
@@ -123,15 +130,13 @@ const FinderRegisterScreen = ({navigation}) => {
 
   const register = () => {
     setLoading(true);
-    auth
-      .createUserWithEmailAndPassword(inputs.email, inputs.password)
+    createUserWithEmailAndPassword(auth, inputs.email, inputs.password)
       .then(async userCredentials => {
         setLoading(false);
         const user = userCredentials.user;
         console.log(user.email);
-
         try {
-          await firestore.collection('users').doc(user.uid).set({
+          await setDoc(doc(firestore, 'users', user.uid), {
             email: user.email,
             fullname: inputs.fullname,
             phone: inputs.phone,

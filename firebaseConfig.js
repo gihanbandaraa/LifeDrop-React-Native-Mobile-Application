@@ -1,6 +1,9 @@
-import * as firebase from 'firebase/compat';
+import { initializeApp } from "firebase/app";
+import { initializeAuth, getAuth, getAuthForApp, ReactNativeFirebaseConfig, getReactNativePersistence } from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-const firebaseConfig = {
+
+const firebaseConfig :ReactNativeFirebaseConfig = {
     apiKey: "AIzaSyDUfdppaDxa-C32m3PlvuP3LKX7S39KJxc",
     authDomain: "lifedrop-cac87.firebaseapp.com",
     projectId: "lifedrop-cac87",
@@ -8,16 +11,11 @@ const firebaseConfig = {
     messagingSenderId: "786759662787",
     appId: "1:786759662787:web:dc8cae826716fa7aab7676"
   };
+  const app = initializeApp(firebaseConfig);
 
-  let firebaseApp;
-  if (firebase.apps.length === 0) {
-    firebaseApp = firebase.initializeApp(firebaseConfig);
-  } else {
-    firebaseApp = firebase.app();
-  }
+  // Initialize Auth with React Native AsyncStorage persistence
+  const auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+  });
   
-  const auth = firebase.auth();
-  const firestore = firebase.firestore();
-  
-  export { firestore };
-  export { auth };
+  export { app, auth };
