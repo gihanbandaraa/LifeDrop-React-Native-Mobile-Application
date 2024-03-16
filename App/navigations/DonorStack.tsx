@@ -1,76 +1,104 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer } from '@react-navigation/native';
 import DonorHomeScreen from '../screens/Home Screen/DonorHomeScreen';
-import DonorChat from '../screens/Other Screens/DonorChat';
-import DonorUserAccount from '../screens/Other Screens/DonorUserAccount';
+import DonorChat from '../screens/Other Screens/DonorsScreens/DonorChat';
+import DonorUserAccount from '../screens/Other Screens/DonorsScreens/DonorUserAccount';
 import AboutUs from '../screens/Other Screens/AboutUs';
+import DonorBloodRequest from '../screens/Other Screens/DonorsScreens/DonorBloodRequest';
+import DonorNewsFeed from '../screens/Other Screens/DonorsScreens/DonorNewsFeed';
+import { createStackNavigator } from '@react-navigation/stack';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
+function Home() {
+  return (
+    <Tab.Navigator
+      initialRouteName="DonorHomeScreen"
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: 25,
+          left: 20,
+          right: 20,
+          elevation: 2,
+          backgroundColor: '#ffffff',
+          borderRadius: 15,
+          height: 90,
+        },
+        tabBarActiveTintColor: 'red',
+      }}
+    >
+      <Tab.Screen
+        name='DonorHomeScreen'
+        component={DonorHomeScreen}
+        options={{
+          tabBarLabel: 'Home',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="home" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name='Chats'
+        component={DonorChat}
+        options={{
+          tabBarLabel: 'Chats',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="chatbox-ellipses" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name='DonorBloodRequest'
+        component={DonorBloodRequest}
+        options={{
+          tabBarLabel: 'About Us',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="add-circle" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name='Account'
+        component={DonorUserAccount}
+        options={{
+          tabBarLabel: 'Account',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person" color={color} size={26} />
+          ),
+        }}
+      />
+      
+    </Tab.Navigator>
+  );
+}
 export default function DonorStack() {
+
+
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        initialRouteName="DonorHomeScreen"
-        screenOptions={{
-          headerShown: false,
-          tabBarShowLabel: false,
-          tabBarStyle: {
-            position: 'absolute',
-            bottom: 25,
-            left: 20,
-            right: 20,
-            elevation: 2,
-            backgroundColor: '#ffffff',
-            borderRadius: 15,
-            height: 90,
-          },
-          tabBarActiveTintColor: 'red',
-        }}
-      >
-        <Tab.Screen
-          name='Home'
-          component={DonorHomeScreen}
-          options={{
-            tabBarLabel: 'Home',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="home" color={color} size={26} />
-            ),
-          }}
+      <Stack.Navigator  screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{ headerShown: false }}
         />
-        <Tab.Screen
-          name='Chats'
-          component={DonorChat}
-          options={{
-            tabBarLabel: 'Chats',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="chatbox-ellipses" color={color} size={26} />
-            ),
-          }}
+        <Stack.Screen
+          name="DonorNewsFeed"
+          component={DonorNewsFeed}
+
         />
-        <Tab.Screen
-          name='Account'
-          component={DonorUserAccount}
-          options={{
-            tabBarLabel: 'Account',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="person" color={color} size={26} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name='About Us'
+        <Stack.Screen
+          name="About Us"
           component={AboutUs}
-          options={{
-            tabBarLabel: 'About Us',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="information-circle" color={color} size={26} />
-            ),
-          }}
+
         />
-      </Tab.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

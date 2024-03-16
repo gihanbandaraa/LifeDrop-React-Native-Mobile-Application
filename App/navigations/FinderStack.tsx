@@ -3,9 +3,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer } from '@react-navigation/native';
 import FinderHomeScreen from '../screens/Home Screen/FinderHomeScreen';
-import FindDonor from '../screens/Other Screens/FindDonor';
-import Chats from '../screens/Other Screens/Chats';
-import UserAccount from '../screens/Other Screens/UserAccount';
+import FindDonor from '../screens/Other Screens/FindersScreens/FindDonor';
+import Chats from '../screens/Other Screens/FindersScreens/Chats';
+import UserAccount from '../screens/Other Screens/FindersScreens/UserAccount';
 import { createStackNavigator } from '@react-navigation/stack';
 
 const Tab = createBottomTabNavigator();

@@ -2,18 +2,23 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {useNavigation} from '@react-navigation/native';
 
-export default function Options() {
+export default function DonorOption() {
   const navigation = useNavigation();
 
   const AboutUs = () => {
     navigation.navigate('About Us');
   };
-  const NewsFeed = () => {
-    navigation.navigate('NewsFeed');
+
+  const Chats = () => {
+    navigation.navigate('Chats');
   };
-  const Search = () => {
-    navigation.navigate('Search');
+  const DonorNewsFeed = () => {
+    navigation.navigate('DonorNewsFeed');
   };
+  const DonorBloodRequest = () => {
+    navigation.navigate('DonorBloodRequest');
+  };
+ 
 
 
   return (
@@ -26,20 +31,20 @@ export default function Options() {
             margin: 15,
           }}>
           <View style={[styles.optionContainer, styles.elevatedCard]}>
-            <View style={styles.option}>
-              <TouchableOpacity onPress={Search}>
-                <Text style={styles.optionText}>Find Donor</Text>
+            <TouchableOpacity onPress={DonorBloodRequest}>
+              <View style={styles.option}>
+                <Text style={styles.optionText}>Blood Requests</Text>
                 <Image
-                  source={require('../images/blood-bag.png')}
+                  source={require('../images/blood-transfusion.png')}
                   style={styles.image}
                 />
-              </TouchableOpacity>
-            </View>
+              </View>
+            </TouchableOpacity>
           </View>
 
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={DonorNewsFeed}>
                 <Text style={styles.optionText}>News Feed</Text>
                 <Image
                   source={require('../images/post.png')}
@@ -57,7 +62,7 @@ export default function Options() {
           }}>
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={Chats}>
                 <Text style={styles.optionText}>Chats</Text>
                 <Image
                   source={require('../images/chat.png')}
@@ -69,7 +74,7 @@ export default function Options() {
 
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={AboutUs}>
                 <Text style={styles.optionText}>About LifeDrop</Text>
                 <Image
                   source={require('../images/file.png')}

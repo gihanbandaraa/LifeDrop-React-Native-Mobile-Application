@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   ToastAndroid,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { getAuth, signInWithEmailAndPassword} from 'firebase/auth';
 import { getFirestore, collection, doc, getDoc } from 'firebase/firestore'; // Updated imports
 import app from '../../../firebaseConfig';
@@ -16,6 +16,7 @@ import Colours from '../../colours/Colours';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { useNavigation } from '@react-navigation/native';
+import LoadingScreen from './LoadingScreen';
 
 const auth = getAuth(app);
 const firestore = getFirestore(app);
@@ -43,14 +44,12 @@ const Login = () => {
             const userData = docSnap.data();
             if (userData.isFinder) {
               
-              AsyncStorage.setItem('userType', 'finder');
-              AsyncStorage.setItem('loginStatus', 'true');
+            
               setLoading(false);
               ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
               navigation.navigate('FinderHomeScreen');
             } else if (userData.isDonor) {
-              AsyncStorage.setItem('userType', 'donor');
-              AsyncStorage.setItem('loginStatus', 'true');
+             
               setLoading(false);
               ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
               navigation.navigate('DonorHomeScreen');
@@ -78,6 +77,9 @@ const Login = () => {
     setInputs(prevState => ({ ...prevState, [input]: text }));
     setError(null);
   };
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <SafeAreaView style={{ backgroundColor: Colours.white, flex: 1 }}>

@@ -25,6 +25,7 @@ export default function AuthStack() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="FinderHomeScreen" component={FinderHomeScreen} />
         <Stack.Screen name="DonorHomeScreen" component={DonorHomeScreen} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

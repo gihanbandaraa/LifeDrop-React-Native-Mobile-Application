@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function FindDonor() {
+export default function DonorBloodRequest() {
   return (
     <View>
-      <Text>FindDonor</Text>
+      <Text>DonorBloodRequest</Text>
     </View>
   )
 }

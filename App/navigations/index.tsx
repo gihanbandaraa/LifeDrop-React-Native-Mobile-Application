@@ -37,12 +37,11 @@ export default function RootNavigation() {
         fetchUserType();
     }, [user]);
 
-    // Render loading indicator if still loading
     if (loading) {
         return <LoadingIndicator />;
     }
 
-    // Render appropriate stack based on user data
+   
     if (user) {
         if (isFinder) {
             return <FinderStack />;
