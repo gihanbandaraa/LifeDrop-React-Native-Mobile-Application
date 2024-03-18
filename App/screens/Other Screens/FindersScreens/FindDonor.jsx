@@ -11,8 +11,6 @@ import {
 import {
   getFirestore,
   collection,
-  query,
-  where,
   getDocs,
   onSnapshot,
 } from 'firebase/firestore';
@@ -20,6 +18,7 @@ import app from '../../../../firebaseConfig';
 import { StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AppMapView from '../../../components/AppMapView';
+import Geolocation from 'react-native-geolocation-service';
 
 const firebaseApp = app;
 const firestore = getFirestore(firebaseApp);
@@ -29,6 +28,7 @@ export default function FindDonor() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [initialRegion, setInitialRegion] = useState(null);
 
   useEffect(() => {
     const fetchDonors = async () => {
@@ -45,6 +45,8 @@ export default function FindDonor() {
               bloodType: data.bloodType,
               city: data.city,
               district: data.district,
+              latitude: data.latitude,
+              longitude: data.longitude,
             });
           }
         });
@@ -56,6 +58,20 @@ export default function FindDonor() {
     };
 
     fetchDonors();
+
+    Geolocation.getCurrentPosition(
+      position => {
+        setInitialRegion({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
+      },
+      error => console.error(error),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+
     const unsubscribe = onSnapshot(collection(firestore, 'users'), snapshot => {
       const donorList = [];
       snapshot.forEach(doc => {
@@ -68,14 +84,15 @@ export default function FindDonor() {
             bloodType: data.bloodType,
             city: data.city,
             district: data.district,
+            latitude: data.latitude,
+            longitude: data.longitude,
           });
         }
       });
       setDonors(donorList);
       setLoading(false);
     });
-  
-    // Unsubscribe from the listener when the component unmounts
+
     return () => unsubscribe();
   }, []);
 
@@ -92,7 +109,7 @@ export default function FindDonor() {
       donor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       donor.bloodType.toLowerCase().includes(searchQuery.toLowerCase()) ||
       donor.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      donor.district.toLowerCase().includes(searchQuery.toLowerCase()),
+      donor.district.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
@@ -106,14 +123,7 @@ export default function FindDonor() {
   return (
     <View style={{ flex: 1 }}>
       {!isSearchActive && (
-        <Text
-          style={{
-            fontFamily: 'Outfit',
-            alignSelf: 'center',
-            fontSize: 35,
-            marginVertical: 20,
-            color: 'black',
-          }}>
+        <Text style={styles.heading}>
           Find Donors
         </Text>
       )}
@@ -128,9 +138,9 @@ export default function FindDonor() {
           onBlur={() => setIsSearchActive(false)}
         />
       </View>
-      {!isSearchActive && <AppMapView />}
+      {!isSearchActive && <AppMapView donors={donors} initialRegion={initialRegion} />}
       {!isSearchActive && (
-        <Text style={{ fontFamily: "Outfit", marginHorizontal: 15, fontSize: 18, color: 'blue' }}>Available Donors</Text>
+        <Text style={styles.subHeading}>Available Donors</Text>
       )}
       <FlatList
         data={filteredDonors}
@@ -236,5 +246,18 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginHorizontal: 10,
+  },
+  heading: {
+    fontFamily: 'Outfit',
+    alignSelf: 'center',
+    fontSize: 35,
+    marginVertical: 20,
+    color: 'black',
+  },
+  subHeading: {
+    fontFamily: 'Outfit',
+    marginHorizontal: 15,
+    fontSize: 18,
+    color: 'blue',
   },
 });

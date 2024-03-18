@@ -1,9 +1,9 @@
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect} from 'react';
-import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
-import {requestLocationPermission} from './PermissionUtils';
+import React, { useEffect } from 'react';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import { requestLocationPermission } from './PermissionUtils';
 
-export default function AppMapView() {
+export default function AppMapView({ donors, initialRegion }) {
   useEffect(() => {
     requestLocationPermission();
   }, []);
@@ -13,8 +13,21 @@ export default function AppMapView() {
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
+        initialRegion={initialRegion}
         showsUserLocation={true}
-      />
+      >
+        {donors.map((donor, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: donor.latitude,
+              longitude: donor.longitude
+            }}
+            title={donor.name}
+            description={`${donor.city}, ${donor.district}`}
+          />
+        ))}
+      </MapView>
     </View>
   );
 }
