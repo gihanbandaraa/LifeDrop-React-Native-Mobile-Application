@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useState} from 'react';
 
@@ -20,6 +21,10 @@ import Button from '../../components/Button';
 import RadioButtonGroup from '../../components/RadioButtonGroup';
 
 import {Picker} from '@react-native-picker/picker';
+import {CheckBox} from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import PrivacyPermissionModal from '../../modals/PrivacyPermissionModal';
+import TermsConditionsModal from '../../modals/TermsPermissonModal';
 
 const FinderRegisterScreen = ({navigation}) => {
   const sriLankanDistricts = [
@@ -65,6 +70,18 @@ const FinderRegisterScreen = ({navigation}) => {
   const [selectedGender, setSelectedGender] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const [privacyPermission, setPrivacyPermission] = useState(false);
+  const [termsAndConditions, setTermsAndConditions] = useState(false);
+  const [privacyModalVisible, setPrivacyModalVisible] = useState(false);
+  const [termsModalVisible, settermsModalVisible] = useState(false);
+
+  const handlePrivacyIconPress = () => {
+    setPrivacyModalVisible(true);
+  };
+  const handleTermsIconPress = () => {
+    settermsModalVisible(true);
+  };
 
   const firebaseApp = app;
 
@@ -139,6 +156,7 @@ const FinderRegisterScreen = ({navigation}) => {
           await setDoc(doc(firestore, 'users', user.uid), {
             email: user.email,
             fullname: inputs.fullname,
+            activeAccount: true,
             phone: inputs.phone,
             isFinder: true,
             nic: inputs.nic,
@@ -283,7 +301,66 @@ const FinderRegisterScreen = ({navigation}) => {
             error={errors.password}
             password
           />
-          <Button title="Register" onPress={validate} />
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginVertical: 10,
+              justifyContent: 'space-around',
+            }}>
+            <CheckBox
+              checked={privacyPermission}
+              onPress={() => setPrivacyPermission(!privacyPermission)}
+            />
+
+            <Text style={{marginLeft: 10, fontFamily: 'Outfit'}}>
+              Allow Privacy Permissions
+            </Text>
+            <TouchableOpacity
+              onPress={handlePrivacyIconPress}
+              style={styles.iconContainer}>
+              <Icon name="alert-circle-outline" size={28} color="gold" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Terms & Conditions */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginVertical: 10,
+              justifyContent: 'space-around',
+            }}>
+            <CheckBox
+              checked={termsAndConditions}
+              onPress={() => setTermsAndConditions(!termsAndConditions)}
+            />
+            <Text style={{marginLeft: 10, fontFamily: 'Outfit'}}>
+              Agree to Terms & Conditions
+            </Text>
+            <TouchableOpacity
+              onPress={handleTermsIconPress}
+              style={styles.iconContainer}>
+              <Icon name="alert-circle-outline" size={28} color="gold" />
+            </TouchableOpacity>
+          </View>
+          <View>
+            <Text
+              style={{
+                color: 'red',
+                marginBottom: 10,
+                fontFamily: 'Outfit Regular',
+              }}>
+              {(!privacyPermission || !termsAndConditions) &&
+                'Please accept both Terms & Conditions and Privacy Permissions before registering.'}
+            </Text>
+          </View>
+          <Button
+            title="Register"
+            onPress={validate}
+            disabled={!privacyPermission || !termsAndConditions}
+          />
           {loading && (
             <ActivityIndicator
               style={{marginTop: 20}}
@@ -303,6 +380,15 @@ const FinderRegisterScreen = ({navigation}) => {
             Already have an account? Login
           </Text>
         </View>
+
+        <PrivacyPermissionModal
+          visible={privacyModalVisible}
+          onClose={() => setPrivacyModalVisible(false)}
+        />
+        <TermsConditionsModal
+          visible={termsModalVisible}
+          onClose={() => settermsModalVisible(false)}
+        />
       </ScrollView>
     </SafeAreaView>
   );

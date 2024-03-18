@@ -29,8 +29,13 @@ export default function RootNavigation() {
                 } catch (error) {
                     console.error('Error fetching user document:', error);
                 } finally {
-                    setLoading(false); // Set loading to false when fetch is completed
+                    setLoading(false);
                 }
+            }
+            else {
+                setTimeout(() => {
+                    setLoading(false);
+                }, 3000);
             }
         };
 
@@ -41,7 +46,7 @@ export default function RootNavigation() {
         return <LoadingIndicator />;
     }
 
-   
+
     if (user) {
         if (isFinder) {
             return <FinderStack />;

@@ -1,3 +1,4 @@
+// Import useState and useEffect hooks
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -7,10 +8,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity, // Import TouchableOpacity
   View,
 } from 'react-native';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
-import { getFirestore, collection, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, doc, getDoc, updateDoc } from 'firebase/firestore'; // Import updateDoc
 
 import app from '../../../../firebaseConfig';
 import DetailsComponent from '../../../components/DetailsComponent';
@@ -21,6 +23,7 @@ const firestore = getFirestore(app);
 export default function UserAccount() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeAccount, setActiveAccount] = useState(false); // State variable for toggle button
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
@@ -31,6 +34,7 @@ export default function UserAccount() {
             if (doc.exists()) {
               const userData = doc.data();
               setUserData(userData);
+              setActiveAccount(userData.activeAccount || false); // Set initial state based on userData
             } else {
               console.log('No such document!');
             }
@@ -39,7 +43,7 @@ export default function UserAccount() {
             console.log('Error getting document:', error);
           })
           .finally(() => {
-            setLoading(false); 
+            setLoading(false);
           });
       } else {
         console.log('User is not signed in.');
@@ -49,6 +53,17 @@ export default function UserAccount() {
 
     return () => unsubscribe();
   }, []);
+
+  const toggleActiveAccount = async () => {
+    try {
+      const user = auth.currentUser;
+      const docRef = doc(firestore, 'users', user.uid);
+      await updateDoc(docRef, { activeAccount: !activeAccount }); // Update Firestore document
+      setActiveAccount(!activeAccount); // Toggle local state
+    } catch (error) {
+      console.error('Error toggling active account:', error);
+    }
+  };
 
   const logout = async () => {
     try {
@@ -76,9 +91,9 @@ export default function UserAccount() {
             <View style={styles.headingContainer}>
               <Text style={styles.headingText}>Settings</Text>
               <Text style={[styles.headingText, { fontSize: 30 }]}>Profile</Text>
-              <Text style={styles.headingText} onPress={logout}>
-                Logout
-              </Text>
+              <TouchableOpacity onPress={logout}>
+                <Text style={styles.headingText}>Logout</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -102,6 +117,13 @@ export default function UserAccount() {
             )}
           </View>
 
+         
+          <TouchableOpacity onPress={toggleActiveAccount}>
+            <View style={[styles.toggleButton, activeAccount ? styles.toggleButtonActive : null]}>
+              <Text style={styles.toggleButtonText}>{activeAccount ? 'Active' : 'Inactive'}</Text>
+            </View>
+          </TouchableOpacity>
+
           <DetailsComponent label={'Email'} userData={userData.email} />
           <DetailsComponent label={'Phone'} userData={userData.phone} />
           <DetailsComponent label={'Address'} userData={userData.address} />
@@ -110,7 +132,6 @@ export default function UserAccount() {
           <DetailsComponent label={'NIC'} userData={userData.nic} />
           <DetailsComponent label={'Gender'} userData={userData.gender} />
           <DetailsComponent label={'Blood Group'} userData={userData.bloodType} />
-  
         </ImageBackground>
       </ScrollView>
     </SafeAreaView>
@@ -148,5 +169,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     padding: 10,
+  },
+  toggleButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'lightgray',
+    borderRadius: 20,
+    paddingVertical: 10,
+    margin: 10,
+  },
+  toggleButtonActive: {
+    backgroundColor: 'red', 
+  },
+  toggleButtonText: {
+    fontSize: 18,
+    fontFamily:"Outfit",
+    color:'#F8F8F8',
+    fontWeight: 'bold',
   },
 });

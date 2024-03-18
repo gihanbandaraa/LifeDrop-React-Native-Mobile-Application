@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,10 +14,12 @@ import {
   query,
   where,
   getDocs,
+  onSnapshot,
 } from 'firebase/firestore';
 import app from '../../../../firebaseConfig';
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AppMapView from '../../../components/AppMapView';
 
 const firebaseApp = app;
 const firestore = getFirestore(firebaseApp);
@@ -26,15 +28,16 @@ export default function FindDonor() {
   const [donors, setDonors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   useEffect(() => {
     const fetchDonors = async () => {
       try {
-        const donorsSnapshot = await getDocs(collection(firestore, 'users'));
+        const querySnapshot = await getDocs(collection(firestore, 'users'));
         const donorList = [];
-        donorsSnapshot.forEach(doc => {
+        querySnapshot.forEach(doc => {
           const data = doc.data();
-          if (data.isDonor) {
+          if (data.isDonor && data.activeAccount) {
             donorList.push({
               name: data.fullname,
               email: data.email,
@@ -53,6 +56,27 @@ export default function FindDonor() {
     };
 
     fetchDonors();
+    const unsubscribe = onSnapshot(collection(firestore, 'users'), snapshot => {
+      const donorList = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.isDonor && data.activeAccount) {
+          donorList.push({
+            name: data.fullname,
+            email: data.email,
+            phone: data.phone,
+            bloodType: data.bloodType,
+            city: data.city,
+            district: data.district,
+          });
+        }
+      });
+      setDonors(donorList);
+      setLoading(false);
+    });
+  
+    // Unsubscribe from the listener when the component unmounts
+    return () => unsubscribe();
   }, []);
 
   const handleCall = phoneNumber => {
@@ -73,24 +97,26 @@ export default function FindDonor() {
 
   if (loading) {
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="red" />
       </View>
     );
   }
 
   return (
-    <View style={{flex: 1}}>
-      <Text
-        style={{
-          fontFamily: 'Outfit',
-          alignSelf: 'center',
-          fontSize: 35,
-          marginVertical: 20,
-          color: 'black',
-        }}>
-        Find Donors
-      </Text>
+    <View style={{ flex: 1 }}>
+      {!isSearchActive && (
+        <Text
+          style={{
+            fontFamily: 'Outfit',
+            alignSelf: 'center',
+            fontSize: 35,
+            marginVertical: 20,
+            color: 'black',
+          }}>
+          Find Donors
+        </Text>
+      )}
       <View style={styles.searchContainer}>
         <Icon name="search" size={20} color="black" style={styles.searchIcon} />
         <TextInput
@@ -98,16 +124,22 @@ export default function FindDonor() {
           placeholder="Search by name, blood type, city, or district..."
           value={searchQuery}
           onChangeText={setSearchQuery}
+          onFocus={() => setIsSearchActive(true)}
+          onBlur={() => setIsSearchActive(false)}
         />
       </View>
+      {!isSearchActive && <AppMapView />}
+      {!isSearchActive && (
+        <Text style={{ fontFamily: "Outfit", marginHorizontal: 15, fontSize: 18, color: 'blue' }}>Available Donors</Text>
+      )}
       <FlatList
         data={filteredDonors}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <View style={styles.userLabel}>
             <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{maxWidth: 180}}>
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={{ maxWidth: 180 }}>
                 <Text style={styles.text}>{item.name}</Text>
                 <Text style={styles.text}>
                   {item.city}, {item.district}
@@ -196,7 +228,7 @@ const styles = StyleSheet.create({
     height: 40,
     fontFamily: 'Outfit Regular',
     fontWeight: 'bold',
-    // color: 'black',
+  
   },
   text: {
     fontFamily: 'Outfit SemiBold',
