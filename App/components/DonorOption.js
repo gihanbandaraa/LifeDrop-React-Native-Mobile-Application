@@ -1,16 +1,18 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import {useNavigation} from '@react-navigation/native';
+import QRModal from '../modals/QRModal';
 
 export default function DonorOption() {
   const navigation = useNavigation();
+  const [showQRModal, setShowQRModal] = useState(false);
+
+  const toggleQRModal = () => {
+    setShowQRModal(!showQRModal);
+  };
 
   const AboutUs = () => {
     navigation.navigate('About Us');
-  };
-
-  const Chats = () => {
-    navigation.navigate('Chats');
   };
   const DonorNewsFeed = () => {
     navigation.navigate('DonorNewsFeed');
@@ -62,10 +64,10 @@ export default function DonorOption() {
           }}>
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity onPress={Chats}>
-                <Text style={styles.optionText}>Chats</Text>
+              <TouchableOpacity  onPress={toggleQRModal}>
+                <Text style={styles.optionText}>Scan Me</Text>
                 <Image
-                  source={require('../images/chat.png')}
+                  source={require('../images/qr.png')}
                   style={styles.image}
                 />
               </TouchableOpacity>
@@ -84,6 +86,7 @@ export default function DonorOption() {
             </View>
           </View>
         </View>
+        <QRModal visible={showQRModal} onClose={toggleQRModal} />
       </View>
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -13,15 +13,20 @@ import {
   collection,
   getDocs,
   onSnapshot,
+  addDoc,
+  serverTimestamp,
 } from 'firebase/firestore';
 import app from '../../../../firebaseConfig';
-import { StyleSheet } from 'react-native';
+import {StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AppMapView from '../../../components/AppMapView';
 import Geolocation from 'react-native-geolocation-service';
+import {getAuth} from 'firebase/auth';
+import {useNavigation} from '@react-navigation/native';
 
 const firebaseApp = app;
 const firestore = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
 
 export default function FindDonor() {
   const [donors, setDonors] = useState([]);
@@ -29,6 +34,7 @@ export default function FindDonor() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [initialRegion, setInitialRegion] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchDonors = async () => {
@@ -69,7 +75,7 @@ export default function FindDonor() {
         });
       },
       error => console.error(error),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
     );
 
     const unsubscribe = onSnapshot(collection(firestore, 'users'), snapshot => {
@@ -104,29 +110,73 @@ export default function FindDonor() {
     Linking.openURL(`mailto:${email}`);
   };
 
+  const handleChat = async donorEmail => {
+    try {
+      const currentUser = auth.currentUser;
+      const querySnapshot = await getDocs(collection(firestore, 'users'));
+      let donorId;
+      querySnapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.email === donorEmail) {
+          donorId = doc.id;
+          return;
+        }
+      });
+
+      const chatRoomsRef = collection(firestore, 'chatRooms');
+      const chatRoomQuerySnapshot = await getDocs(chatRoomsRef);
+      let existingChatRoomId;
+
+      // Check if a chat room already exists between the current user and the donor
+      chatRoomQuerySnapshot.forEach(doc => {
+        const chatRoomData = doc.data();
+        const users = chatRoomData.users;
+        if (users.includes(currentUser.uid) && users.includes(donorId)) {
+          existingChatRoomId = doc.id;
+          return;
+        }
+      });
+
+      // If an existing chat room ID is found, use it
+      if (existingChatRoomId) {
+        // Navigate the user to the chat room screen with existingChatRoomId
+        console.log('Existing chat room found:', existingChatRoomId);
+        navigation.navigate('Chats');
+      } else {
+        // Otherwise, create a new chat room
+        const newChatRoomRef = await addDoc(chatRoomsRef, {
+          users: [currentUser.uid, donorId],
+          createdAt: serverTimestamp(),
+        });
+        const newChatRoomId = newChatRoomRef.id;
+        console.log('New chat room created:', newChatRoomId);
+        // Navigate the user to the chat room screen with newChatRoomId
+        navigation.navigate('Chats');
+      }
+    } catch (error) {
+      console.error('Error handling chat:', error);
+    }
+  };
+
   const filteredDonors = donors.filter(
     donor =>
       donor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       donor.bloodType.toLowerCase().includes(searchQuery.toLowerCase()) ||
       donor.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      donor.district.toLowerCase().includes(searchQuery.toLowerCase())
+      donor.district.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator size="large" color="red" />
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      {!isSearchActive && (
-        <Text style={styles.heading}>
-          Find Donors
-        </Text>
-      )}
+    <View style={{flex: 1}}>
+      {!isSearchActive && <Text style={styles.heading}>Find Donors</Text>}
       <View style={styles.searchContainer}>
         <Icon name="search" size={20} color="black" style={styles.searchIcon} />
         <TextInput
@@ -138,21 +188,27 @@ export default function FindDonor() {
           onBlur={() => setIsSearchActive(false)}
         />
       </View>
-      {!isSearchActive && <AppMapView donors={donors} initialRegion={initialRegion} />}
+      {!isSearchActive && (
+        <AppMapView donors={donors} initialRegion={initialRegion} />
+      )}
       {!isSearchActive && (
         <Text style={styles.subHeading}>Available Donors</Text>
       )}
       <FlatList
         data={filteredDonors}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <View style={styles.userLabel}>
             <View
-              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View style={{ maxWidth: 180 }}>
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              <View style={{maxWidth: 180}}>
                 <Text style={styles.text}>{item.name}</Text>
                 <Text style={styles.text}>
-                  {item.city}, {item.district}
+                  {item.city},{'\n'}
+                  {item.district}.
                 </Text>
               </View>
               <View>
@@ -183,10 +239,18 @@ export default function FindDonor() {
                       {item.bloodType}
                     </Text>
                   </View>
+                  <TouchableOpacity onPress={() => handleChat(item.email)}>
+                    <Icon
+                      name="comments"
+                      size={25}
+                      color="gold"
+                      style={styles.icon}
+                    />
+                  </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleCall(item.phone)}>
                     <Icon
                       name="phone"
-                      size={24}
+                      size={25}
                       color="green"
                       style={styles.icon}
                     />
@@ -194,7 +258,7 @@ export default function FindDonor() {
                   <TouchableOpacity onPress={() => handleEmail(item.email)}>
                     <Icon
                       name="envelope"
-                      size={24}
+                      size={25}
                       color="blue"
                       style={styles.icon}
                     />
@@ -238,7 +302,6 @@ const styles = StyleSheet.create({
     height: 40,
     fontFamily: 'Outfit Regular',
     fontWeight: 'bold',
-  
   },
   text: {
     fontFamily: 'Outfit SemiBold',

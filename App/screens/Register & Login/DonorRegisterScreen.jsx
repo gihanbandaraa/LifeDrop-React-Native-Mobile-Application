@@ -189,16 +189,6 @@ const DonorRegisterScreen = ({navigation}) => {
               longitude: longitude,
             });
             console.log('User data added to Firestore successfully!');
-            Alert.alert(
-              'Registration Successful',
-              'Your account has been registered successfully!',
-              [
-                {
-                  text: 'OK',
-                  onPress: () => navigation.navigate('Login'),
-                },
-              ],
-            );
           } catch (error) {
             console.error('Error adding user data to Firestore: ', error);
             setLoading(false);

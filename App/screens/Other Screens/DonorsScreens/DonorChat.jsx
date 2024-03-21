@@ -1,12 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import {StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator} from 'react-native';
 import {
   collection,
   getDocs,
@@ -18,18 +11,18 @@ import {
 import {getAuth} from 'firebase/auth';
 import {getFirestore} from 'firebase/firestore';
 import app from '../../../../firebaseConfig';
-import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
 
 // Assuming you have initialized Firebase in a file called firebase.js
 const firebaseApp = app;
 const firestore = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
 
-export default function Chats() {
+export default function DonorChats() {
   const [chats, setChats] = useState([]);
+  const [loading, setLoading] = useState(true); // State variable for loading indicator
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -52,32 +45,37 @@ export default function Chats() {
           console.log('Processing document:', chatRoomDoc.id);
           const chatRoomData = chatRoomDoc.data();
           console.log('Chat Room Data:', chatRoomData);
-          const donorId = chatRoomData.users.find(id => id !== currentUser.uid);
-          console.log('Donor ID:', donorId);
+          const otherUserId = chatRoomData.users.find(
+            id => id !== currentUser.uid,
+          );
+          console.log('Other User ID:', otherUserId);
 
           // Retrieve the user document from 'users' collection using the document path
-          const donorDocSnapshot = await getDoc(
-            doc(firestore, `users/${donorId}`),
+          const otherUserDocSnapshot = await getDoc(
+            doc(firestore, `users/${otherUserId}`),
           ); // Using document path
-          console.log('Donor Document Snapshot:', donorDocSnapshot);
+          console.log('Other User Document Snapshot:', otherUserDocSnapshot);
 
-          if (donorDocSnapshot.exists()) {
-            const donorData = donorDocSnapshot.data();
-            console.log('Donor Data:', donorData);
+          if (otherUserDocSnapshot.exists()) {
+            const otherUserData = otherUserDocSnapshot.data();
+            console.log('Other User Data:', otherUserData);
             chatsData.push({
               chatRoomId: chatRoomDoc.id,
               currentUserId: currentUser.uid,
-              donorId,
-              donorName: donorData.fullname, // Assuming the donor's name is stored in the 'fullname' field
+              otherUserId,
+              otherUserName: otherUserData.fullname, // Assuming the other user's name is stored in the 'fullname' field
             });
           } else {
-            console.log('Donor document does not exist for donorId:', donorId);
+            console.log(
+              'Other user document does not exist for otherUserId:',
+              otherUserId,
+            );
           }
         }
 
         console.log('Chats Data:', chatsData);
         setChats(chatsData);
-        setLoading(false);
+        setLoading(false); // Set loading to false when chats are fetched
       } catch (error) {
         console.error('Error fetching chats:', error);
       }
@@ -86,14 +84,16 @@ export default function Chats() {
     fetchChats();
   }, []);
 
-  const handleChatPress = (chatRoomId, donorId, donorName) => {
+  const handleChatPress = (chatRoomId, otherUserId, otherUserName, currentUserId) => {
+    // Navigate to the message room screen and pass necessary data
     navigation.navigate('MessageRoom', {
       chatRoomId,
-      otherUserId: donorId,
-      otherUserName: donorName,
-      currentUserId: auth.currentUser.uid,
+      otherUserId,
+      otherUserName,
+      currentUserId,
     });
   };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -110,11 +110,16 @@ export default function Chats() {
         renderItem={({item}) => (
           <TouchableOpacity
             onPress={() =>
-              handleChatPress(item.chatRoomId, item.donorId, item.donorName)
+              handleChatPress(
+                item.chatRoomId,
+                item.otherUserId,
+                item.otherUserName,
+                item.currentUserId,
+              )
             }>
             <View style={styles.chatItem}>
               <Ionicons name="person" size={25} color={'black'} />
-              <Text style={styles.chatItemText}>{item.donorName}</Text>
+              <Text style={styles.chatItemText}>{item.otherUserName}</Text>
             </View>
           </TouchableOpacity>
         )}

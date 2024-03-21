@@ -14,6 +14,9 @@ export default function Options() {
   const Search = () => {
     navigation.navigate('Search');
   };
+  const Chats = () => {
+    navigation.navigate('Chats');
+  };
 
 
   return (
@@ -39,7 +42,7 @@ export default function Options() {
 
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={NewsFeed}>
                 <Text style={styles.optionText}>News Feed</Text>
                 <Image
                   source={require('../images/post.png')}
@@ -57,7 +60,7 @@ export default function Options() {
           }}>
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={Chats}>
                 <Text style={styles.optionText}>Chats</Text>
                 <Image
                   source={require('../images/chat.png')}
