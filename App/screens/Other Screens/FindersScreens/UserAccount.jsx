@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -12,11 +12,19 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
-import { getFirestore, doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import {getAuth, onAuthStateChanged, signOut} from 'firebase/auth';
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  onSnapshot,
+} from 'firebase/firestore';
 import app from '../../../../firebaseConfig';
+import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import DetailsComponent from '../../../components/DetailsComponent';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome icon
+import Icon from 'react-native-vector-icons/FontAwesome';
+import * as ImagePicker from 'react-native-image-picker'; // Import FontAwesome icon
 
 const auth = getAuth(app);
 const firestore = getFirestore(app);
@@ -27,6 +35,7 @@ export default function UserAccount() {
   const [activeAccount, setActiveAccount] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [updatedFullName, setUpdatedFullName] = useState('');
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
@@ -56,7 +65,7 @@ export default function UserAccount() {
     try {
       const user = auth.currentUser;
       const docRef = doc(firestore, 'users', user.uid);
-      await updateDoc(docRef, { activeAccount: !activeAccount });
+      await updateDoc(docRef, {activeAccount: !activeAccount});
       setActiveAccount(!activeAccount);
     } catch (error) {
       console.error('Error toggling active account:', error);
@@ -71,6 +80,43 @@ export default function UserAccount() {
     }
   };
 
+  const pickImage = () => {
+    ImagePicker.launchImageLibrary({}, async response => {
+      console.log('ImagePicker response:', response);
+      if (!response.didCancel) {
+        setImage(response); // Set selected image in state
+        try {
+          if (!response.assets || response.assets.length === 0) {
+            throw new Error('No image selected');
+          }
+
+          const imageUri = response.assets[0].uri;
+          const uploadResponse = await fetch(imageUri);
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to fetch image');
+          }
+          const blob = await uploadResponse.blob();
+
+          const currentUserUID = auth.currentUser.uid;
+          const filename = `${currentUserUID}`;
+
+          const storage = getStorage(app);
+          const storageRef = ref(storage, `profilePics/${filename}`);
+          await uploadBytes(storageRef, blob);
+
+          const downloadURL = await getDownloadURL(storageRef); // Corrected function call
+
+          
+          const userDocRef = doc(firestore, 'users', currentUserUID);
+          await updateDoc(userDocRef, {profileImage: downloadURL});
+
+          alert('Profile picture Updated successfully!');
+        } catch (error) {
+          console.error('Error uploading profile picture:', error);
+        }
+      }
+    });
+  };
   const handleEditClick = () => {
     setIsModalVisible(true);
     setUpdatedFullName(userData.fullname || '');
@@ -81,7 +127,7 @@ export default function UserAccount() {
       const user = auth.currentUser;
       const userId = user.uid;
       const userDocRef = doc(firestore, 'users', userId);
-      await updateDoc(userDocRef, { fullname: updatedFullName });
+      await updateDoc(userDocRef, {fullname: updatedFullName});
       setIsModalVisible(false);
       console.log('Full name updated successfully!');
     } catch (error) {
@@ -99,32 +145,58 @@ export default function UserAccount() {
 
   return (
     <SafeAreaView>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <ImageBackground
           source={require('../../../images/background.png')}
-          style={{ height: '100%' }}>
+          style={{height: '100%'}}>
           <View>
             <View style={styles.headingContainer}>
               <Text style={styles.headingText}>Settings</Text>
-              <Text style={[styles.headingText, { fontSize: 30 }]}>Profile</Text>
+              <Text style={[styles.headingText, {fontSize: 30}]}>Profile</Text>
               <TouchableOpacity onPress={logout}>
                 <Text style={styles.headingText}>Logout</Text>
               </TouchableOpacity>
             </View>
           </View>
 
+       
           <View style={styles.profileIcon}>
-            <Image
-              source={require('../../../images/account.png')}
-              style={{ width: 100, height: 100 }}
-            />
+            {userData.profileImage ? (
+              <Image
+                source={{uri: userData.profileImage}}
+                style={{width: 150, height: 150, borderRadius: 75}}
+              />
+            ) : (
+              <Image
+                source={require('../../../images/account.png')}
+                style={{width: 100, height: 100}}
+              />
+            )}
+            <TouchableOpacity onPress={pickImage} style={styles.cameraButton}>
+              <Icon name="camera" size={24} color="black" style={styles.icon} />
+            </TouchableOpacity>
           </View>
-          <View style={{ alignItems: 'center', marginVertical: 10 }}>
+
+      
+          <View style={{alignItems: 'center', marginVertical: 10}}>
             {userData && userData.gender && (
               <TouchableOpacity onPress={handleEditClick}>
-                <Text style={{ fontFamily: 'Outfit', fontSize: 26, color: 'black', alignSelf: 'center',marginHorizontal:5 }}>
+                <Text
+                  style={{
+                    fontFamily: 'Outfit',
+                    fontSize: 26,
+                    color: 'black',
+                    alignSelf: 'center',
+                    marginHorizontal: 5,
+                    marginTop:10
+                  }}>
                   {userData.fullname}
-                  <Icon name="pencil" size={20} color="black" style={styles.pencilIcon} />
+                  <Icon
+                    name="pencil"
+                    size={20}
+                    color="black"
+                    style={styles.pencilIcon}
+                  />
                 </Text>
               </TouchableOpacity>
             )}
@@ -155,6 +227,8 @@ export default function UserAccount() {
               userData={userData.bloodType}
             />
           )}
+          <View style={{height:120}}></View>
+      
 
           <Modal visible={isModalVisible} animationType="slide">
             <View style={styles.modalContainer}>
@@ -192,7 +266,7 @@ const styles = StyleSheet.create({
   },
   profileIcon: {
     alignSelf: 'center',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     width: 180,
@@ -200,6 +274,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     borderRadius: 180 / 2,
     elevation: 3,
+    marginVertical:15
+  },
+  cameraButton: {
+    position: 'absolute',
+    top: 150,
+    right: 5,
+    backgroundColor: 'white', 
+    padding: 10, 
+    borderRadius:50
   },
   loadingContainer: {
     flex: 1,
@@ -209,7 +292,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     padding: 10,
-  }, toggleButton: {
+  },
+  toggleButton: {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'lightgray',
@@ -259,5 +343,8 @@ const styles = StyleSheet.create({
     color: 'white',
     padding: 10,
     borderRadius: 5,
+  },
+  icon: {
+    alignSelf: 'flex-end',
   },
 });

@@ -4,6 +4,11 @@ import Geolocation from 'react-native-geolocation-service';
 
 const GeolocationUpdater = ({ firestore, user }) => {
   useEffect(() => {
+    if (!user) {
+      // If there's no authenticated user, do nothing
+      return;
+    }
+
     const updateFirestoreWithLocation = async () => {
       try {
         Geolocation.getCurrentPosition(
@@ -29,12 +34,11 @@ const GeolocationUpdater = ({ firestore, user }) => {
       }
     };
 
-    // Call the function to update the location immediately and set up interval to update location every minute
+    // Call the function only if there's an authenticated user
     updateFirestoreWithLocation();
 
-    const intervalId = setInterval(updateFirestoreWithLocation, 60000);
-
-    // Clean up the interval on component unmount
+    // Set interval only if there's an authenticated user
+    const intervalId = setInterval(updateFirestoreWithLocation, 50000);
     return () => clearInterval(intervalId);
   }, [firestore, user]);
 

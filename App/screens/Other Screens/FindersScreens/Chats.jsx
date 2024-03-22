@@ -20,6 +20,7 @@ import {getFirestore} from 'firebase/firestore';
 import app from '../../../../firebaseConfig';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Image } from 'react-native';
 
 // Assuming you have initialized Firebase in a file called firebase.js
 const firebaseApp = app;
@@ -68,7 +69,9 @@ export default function Chats() {
               chatRoomId: chatRoomDoc.id,
               currentUserId: currentUser.uid,
               donorId,
-              donorName: donorData.fullname, // Assuming the donor's name is stored in the 'fullname' field
+              donorName: donorData.fullname, 
+              donorProfileImage: donorData.profileImage,
+              // Assuming the donor's name is stored in the 'fullname' field
             });
           } else {
             console.log('Donor document does not exist for donorId:', donorId);
@@ -92,6 +95,7 @@ export default function Chats() {
       otherUserId: donorId,
       otherUserName: donorName,
       currentUserId: auth.currentUser.uid,
+      
     });
   };
   if (loading) {
@@ -113,7 +117,14 @@ export default function Chats() {
               handleChatPress(item.chatRoomId, item.donorId, item.donorName)
             }>
             <View style={styles.chatItem}>
-              <Ionicons name="person" size={25} color={'black'} />
+              {item.donorProfileImage ? (
+                <Image
+                  source={{uri: item.donorProfileImage}}
+                  style={styles.profileImage}
+                />
+              ) : (
+                <Ionicons name="person" size={50} color={'black'} />
+              )}
               <Text style={styles.chatItemText}>{item.donorName}</Text>
             </View>
           </TouchableOpacity>
@@ -150,5 +161,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 8,
     color: 'black',
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
   },
 });

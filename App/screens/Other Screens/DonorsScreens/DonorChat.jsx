@@ -1,5 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Image,
+} from 'react-native';
 import {
   collection,
   getDocs,
@@ -63,7 +71,8 @@ export default function DonorChats() {
               chatRoomId: chatRoomDoc.id,
               currentUserId: currentUser.uid,
               otherUserId,
-              otherUserName: otherUserData.fullname, // Assuming the other user's name is stored in the 'fullname' field
+              otherUserName: otherUserData.fullname,
+              otherUserProfileImage: otherUserData.profileImage, // Assuming the other user's name is stored in the 'fullname' field
             });
           } else {
             console.log(
@@ -84,7 +93,12 @@ export default function DonorChats() {
     fetchChats();
   }, []);
 
-  const handleChatPress = (chatRoomId, otherUserId, otherUserName, currentUserId) => {
+  const handleChatPress = (
+    chatRoomId,
+    otherUserId,
+    otherUserName,
+    currentUserId,
+  ) => {
     // Navigate to the message room screen and pass necessary data
     navigation.navigate('MessageRoom', {
       chatRoomId,
@@ -118,7 +132,14 @@ export default function DonorChats() {
               )
             }>
             <View style={styles.chatItem}>
-              <Ionicons name="person" size={25} color={'black'} />
+              {item.otherUserProfileImage ? (
+                <Image
+                  source={{uri: item.otherUserProfileImage}}
+                  style={styles.profileImage}
+                />
+              ) : (
+                <Ionicons name="person" size={50} color={'black'} />
+              )}
               <Text style={styles.chatItemText}>{item.otherUserName}</Text>
             </View>
           </TouchableOpacity>
@@ -155,5 +176,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 8,
     color: 'black',
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
   },
 });

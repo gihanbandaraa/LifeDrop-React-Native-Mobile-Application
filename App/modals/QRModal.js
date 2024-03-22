@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
-import generateQRCode from '../components/QRCodeGenerator'; // Import the QR code generator
+import generateQRCode from '../components/QRCodeGenerator'; 
 
 const QRModal = ({ visible, onClose, userData }) => {
   return (
@@ -11,7 +11,6 @@ const QRModal = ({ visible, onClose, userData }) => {
       onRequestClose={onClose}>
       <TouchableOpacity style={styles.modalOverlay} onPress={onClose}>
         <View style={styles.modalContent}>
-          {/* Display the generated QR code */}
           {generateQRCode(userData)}
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeButtonText}>Close</Text>
@@ -41,6 +40,7 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: 'blue',
     fontSize: 18,
+    fontFamily:'Outfit'
   },
 });
 

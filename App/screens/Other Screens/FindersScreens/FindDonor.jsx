@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Linking,
   TextInput,
+  Alert,
 } from 'react-native';
 import {
   getFirestore,
@@ -15,6 +16,10 @@ import {
   onSnapshot,
   addDoc,
   serverTimestamp,
+  getDoc,
+  doc,
+  query,
+  where,
 } from 'firebase/firestore';
 import app from '../../../../firebaseConfig';
 import {StyleSheet} from 'react-native';
@@ -127,7 +132,6 @@ export default function FindDonor() {
       const chatRoomQuerySnapshot = await getDocs(chatRoomsRef);
       let existingChatRoomId;
 
-      // Check if a chat room already exists between the current user and the donor
       chatRoomQuerySnapshot.forEach(doc => {
         const chatRoomData = doc.data();
         const users = chatRoomData.users;
@@ -137,20 +141,16 @@ export default function FindDonor() {
         }
       });
 
-      // If an existing chat room ID is found, use it
       if (existingChatRoomId) {
-        // Navigate the user to the chat room screen with existingChatRoomId
         console.log('Existing chat room found:', existingChatRoomId);
         navigation.navigate('Chats');
       } else {
-        // Otherwise, create a new chat room
         const newChatRoomRef = await addDoc(chatRoomsRef, {
           users: [currentUser.uid, donorId],
           createdAt: serverTimestamp(),
         });
         const newChatRoomId = newChatRoomRef.id;
         console.log('New chat room created:', newChatRoomId);
-        // Navigate the user to the chat room screen with newChatRoomId
         navigation.navigate('Chats');
       }
     } catch (error) {
@@ -166,6 +166,88 @@ export default function FindDonor() {
       donor.district.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const randomMessages = [
+    'I need blood urgently',
+    'Please donate blood to save a life',
+    'Urgent blood donation needed',
+    'Seeking blood donation for medical emergency',
+    'Blood donation request for critical situation',
+  ];
+  
+  const randomMessage = randomMessages[Math.floor(Math.random() * randomMessages.length)];
+  
+  const handleBloodRequest = async donorEmail => {
+    try {
+      const currentUser = auth.currentUser;
+  
+      // Retrieve donor's ID
+      const querySnapshot = await getDocs(collection(firestore, 'users'));
+      let donorId;
+      querySnapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.email === donorEmail) {
+          donorId = doc.id;
+          return;
+        }
+      });
+  
+      if (!donorId) {
+        console.error('Donor ID not found for the given email:', donorEmail);
+        return;
+      }
+  
+      // Check if there's an existing request from the current user to this donor
+      const bloodRequestsRef = collection(
+        firestore,
+        'users',
+        donorId,
+        'bloodRequests',
+      );
+      const existingRequestQuerySnapshot = await getDocs(
+        query(bloodRequestsRef, where('requesterId', '==', currentUser.uid)),
+      );
+  
+      if (!existingRequestQuerySnapshot.empty) {
+        Alert.alert(
+          'Duplicate Request',
+          'You have already made a request to this donor.',
+          [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+          { cancelable: false }
+        );
+        return;
+      }
+  
+      // Get the current user's document
+      const currentUserDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
+      
+      // Extract the current user's data from the document
+      const currentUserData = currentUserDoc.data();
+      
+      // Get the current user's phone number
+      const currentUserPhoneNumber = currentUserData.phone;
+      
+  
+      await addDoc(bloodRequestsRef, {
+        message: randomMessage,
+        requesterId: currentUser.uid,
+        requesterPhoneNumber: currentUserPhoneNumber,
+        timestamp: serverTimestamp(),
+      });
+
+      Alert.alert(
+        'Success',
+        'Your blood request has been initiated successfully.',
+        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+        { cancelable: false }
+      );
+  
+      console.log('Blood request initiated and saved');
+    } catch (error) {
+      console.error('Error handling blood request:', error);
+    }
+  };
+  
+  
   if (loading) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -260,6 +342,16 @@ export default function FindDonor() {
                       name="envelope"
                       size={25}
                       color="blue"
+                      style={styles.icon}
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => handleBloodRequest(item.email)}>
+                    <Icon
+                      name="plus"
+                      size={25}
+                      color="red"
                       style={styles.icon}
                     />
                   </TouchableOpacity>
