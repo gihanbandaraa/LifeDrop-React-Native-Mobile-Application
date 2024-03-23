@@ -1,5 +1,5 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import QRModal from '../modals/QRModal';
 
@@ -20,8 +20,6 @@ export default function DonorOption() {
   const DonorBloodRequest = () => {
     navigation.navigate('DonorBloodRequest');
   };
- 
-
 
   return (
     <>
@@ -64,7 +62,7 @@ export default function DonorOption() {
           }}>
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity  onPress={toggleQRModal}>
+              <TouchableOpacity onPress={toggleQRModal}>
                 <Text style={styles.optionText}>Scan Me</Text>
                 <Image
                   source={require('../images/qr.png')}

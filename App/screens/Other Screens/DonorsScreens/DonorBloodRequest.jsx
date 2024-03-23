@@ -99,7 +99,7 @@ export default function DonorBloodRequest() {
                       <Text
                         style={[
                           styles.detailText,
-                          {fontSize: 16, fontWeight: 'bold', marginVertical: 1},
+                          {fontSize: 16, marginVertical: 1,fontFamily:'Outfit Regular',color:'black'},
                         ]}>
                         Requester Details:
                       </Text>

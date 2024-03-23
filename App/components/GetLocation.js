@@ -12,10 +12,10 @@ export default function GetLocation() {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
-          title: 'Cool Photo App Camera Permission',
+          title: 'Cool LifeDrop Need Location Permission',
           message:
-            'Cool Photo App needs access to your camera ' +
-            'so you can take awesome pictures.',
+            'LifeDrop  App needs access to your location ' +
+            'so you can take find campaigns.',
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',

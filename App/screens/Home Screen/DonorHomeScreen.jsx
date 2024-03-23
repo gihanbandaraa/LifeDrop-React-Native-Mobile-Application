@@ -14,7 +14,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DonorOption from '../../components/DonorOption';
 import GeolocationUpdater from '../../components/GeolocationUpdater';
 import {getFirestore} from 'firebase/firestore';
-import UploadProfilePic from '../../components/UploadProfilePic';
+
 
 const auth = getAuth(app);
 const firestore = getFirestore(app);

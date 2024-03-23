@@ -18,7 +18,6 @@ export default function Options() {
     navigation.navigate('Chats');
   };
 
-
   return (
     <>
       <View style={{marginTop: 40}}>

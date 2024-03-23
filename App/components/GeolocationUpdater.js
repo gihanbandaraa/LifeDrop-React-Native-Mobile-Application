@@ -22,7 +22,7 @@ const GeolocationUpdater = ({ firestore, user }) => {
               longitude: longitude,
             });
 
-            console.log('User location updated on Firestore successfully!');
+            // console.log('User location updated on Firestore successfully!');
           },
           error => {
             console.error('Error getting current position:', error);

@@ -11,6 +11,7 @@ import {
   View,
   Modal,
   TextInput,
+  Alert,
 } from 'react-native';
 import {getAuth, onAuthStateChanged, signOut} from 'firebase/auth';
 import {
@@ -25,6 +26,7 @@ import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import DetailsComponent from '../../../components/DetailsComponent';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as ImagePicker from 'react-native-image-picker'; // Import FontAwesome icon
+import {Button} from 'react-native-elements';
 
 const auth = getAuth(app);
 const firestore = getFirestore(app);
@@ -106,7 +108,6 @@ export default function UserAccount() {
 
           const downloadURL = await getDownloadURL(storageRef); // Corrected function call
 
-          
           const userDocRef = doc(firestore, 'users', currentUserUID);
           await updateDoc(userDocRef, {profileImage: downloadURL});
 
@@ -135,6 +136,35 @@ export default function UserAccount() {
     }
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'Are you sure you want to delete your account?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              const user = auth.currentUser;
+              await deleteDoc(doc(firestore, 'users', user.uid)); // Delete user data from Firestore
+              await deleteUser(user); // Delete user account
+              console.log('User account deleted successfully.');
+              signOut(auth); // Sign out the user
+            } catch (error) {
+              console.error('Error deleting user account:', error);
+            }
+          },
+          style: 'destructive',
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
   if (loading) {
     return (
       <View style={[styles.loadingContainer, styles.horizontal]}>
@@ -145,7 +175,7 @@ export default function UserAccount() {
 
   return (
     <SafeAreaView>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView contentContainerStyle={{flexGrow: 1}}>
         <ImageBackground
           source={require('../../../images/background.png')}
           style={{height: '100%'}}>
@@ -159,7 +189,6 @@ export default function UserAccount() {
             </View>
           </View>
 
-       
           <View style={styles.profileIcon}>
             {userData.profileImage ? (
               <Image
@@ -177,8 +206,7 @@ export default function UserAccount() {
             </TouchableOpacity>
           </View>
 
-      
-          <View style={{alignItems: 'center', marginVertical: 10}}>
+          <View style={{alignItems: 'center', marginTop: 15}}>
             {userData && userData.gender && (
               <TouchableOpacity onPress={handleEditClick}>
                 <Text
@@ -188,7 +216,7 @@ export default function UserAccount() {
                     color: 'black',
                     alignSelf: 'center',
                     marginHorizontal: 5,
-                    marginTop:10
+                    marginTop: 20,
                   }}>
                   {userData.fullname}
                   <Icon
@@ -214,6 +242,12 @@ export default function UserAccount() {
             </View>
           </TouchableOpacity>
 
+          <TouchableOpacity
+            onPress={handleDeleteAccount}
+            style={styles.deleteButton}>
+            <Text style={styles.deleteButtonText}>Delete Account</Text>
+          </TouchableOpacity>
+
           <DetailsComponent label={'Email'} userData={userData.email} />
           <DetailsComponent label={'Phone'} userData={userData.phone} />
           <DetailsComponent label={'Address'} userData={userData.address} />
@@ -227,8 +261,7 @@ export default function UserAccount() {
               userData={userData.bloodType}
             />
           )}
-          <View style={{height:120}}></View>
-      
+          <View style={{height: 120}}></View>
 
           <Modal visible={isModalVisible} animationType="slide">
             <View style={styles.modalContainer}>
@@ -274,15 +307,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     borderRadius: 180 / 2,
     elevation: 3,
-    marginVertical:15
+    marginVertical: 15,
   },
   cameraButton: {
     position: 'absolute',
     top: 150,
     right: 5,
-    backgroundColor: 'white', 
-    padding: 10, 
-    borderRadius:50
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 50,
   },
   loadingContainer: {
     flex: 1,
@@ -308,7 +341,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Outfit',
     color: '#F8F8F8',
-    fontWeight: 'bold',
+
   },
   pencilIcon: {
     marginLeft: 5,
@@ -346,5 +379,19 @@ const styles = StyleSheet.create({
   },
   icon: {
     alignSelf: 'flex-end',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    alignItems: 'center',
+    margin: 10,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontFamily:'Outfit'
   },
 });

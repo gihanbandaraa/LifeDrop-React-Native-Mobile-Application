@@ -3,7 +3,7 @@ import { StatusBar, StyleSheet, PermissionsAndroid, Alert } from 'react-native';
 import RootNavigation from './App/navigations';
 import './firebaseConfig';
 import { getAuth } from 'firebase/auth';
-import './polyfills'; 
+import './polyfills';
 
 
 
@@ -11,13 +11,6 @@ export default function App() {
   useEffect(() => {
     requestLocationPermission();
   }, []);
-
-
-  const auth = getAuth();
-  auth.onAuthStateChanged(user => {
-    console.log(user);
-  });
-
 
   const requestLocationPermission = async () => {
     try {

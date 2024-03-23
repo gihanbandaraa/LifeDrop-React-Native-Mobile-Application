@@ -47,6 +47,8 @@ export default function DonorUserAccount() {
     return () => unsubscribe();
   }, []);
 
+
+  
   if (loading) {
     return (
       <View style={[styles.loadingContainer, styles.horizontal]}>

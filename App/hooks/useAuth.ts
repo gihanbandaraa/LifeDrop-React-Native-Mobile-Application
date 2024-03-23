@@ -6,7 +6,6 @@ const auth = getAuth();
 export function useAuth() {
   
   const [user, setUser] = React.useState<User>();
-  console.log("isnide the auth:",user)
   useEffect(() => {
     const unsubscribeFromAuthStateChanged = onAuthStateChanged(auth, (user) => {
    if (user) {

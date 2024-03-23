@@ -4,8 +4,8 @@ import { getFirestore, collection, onSnapshot, query } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth';
 import app from '../../../../firebaseConfig';
 import { ScrollView } from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import MaterialIcons from react-native-vector-icons
-import PushNotification from 'react-native-push-notification';
+import Icon from 'react-native-vector-icons/MaterialIcons'; 
+
 
 
 export default function NewsFeed() {
@@ -59,13 +59,6 @@ export default function NewsFeed() {
       const url = `https://www.google.com/maps/dir/?api=1&destination=${venue}`;
       Linking.openURL(url);
     }
-  };
-
-  const setReminder = () => {
-    // Here you can implement a feature to set a reminder
-    // You can use a library like react-native-push-notification to schedule reminders
-    // Example: set a reminder for the event
-    alert('Reminder set successfully!');
   };
 
   return (

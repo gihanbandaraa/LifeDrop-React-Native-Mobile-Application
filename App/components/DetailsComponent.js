@@ -36,7 +36,6 @@ const DetailsComponent = ({ label, userData }) => {
   const handleCancel = () => {
     setIsEditing(false);
     setIsModalVisible(false);
-    // Reset the temporary value to the original value
     setUpdatedValue(tempValue);
   };
 

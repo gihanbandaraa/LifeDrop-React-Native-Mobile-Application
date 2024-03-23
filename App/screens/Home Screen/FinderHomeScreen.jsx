@@ -17,7 +17,6 @@ export default function FinderHomeScreen() {
   return (
     <SafeAreaView style={{backgroundColor: '#F8F8F8',height:"100%"}}>
       <ScrollView style={styles.container}>
-        <Text>Finder</Text>
         <View style={styles.headingContainer}>
           <Image
             source={require('../../images/Logo.png')}
