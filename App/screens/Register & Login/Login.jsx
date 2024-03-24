@@ -1,11 +1,25 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, Text, View, StyleSheet, ActivityIndicator, ToastAndroid } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth, firestore } from '../../../firebaseConfig';
+import {
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  ToastAndroid,
+} from 'react-native';
+
+import { getAuth, signInWithEmailAndPassword} from 'firebase/auth';
+import { getFirestore, collection, doc, getDoc } from 'firebase/firestore'; // Updated imports
+import app from '../../../firebaseConfig';
 import Colours from '../../colours/Colours';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { useNavigation } from '@react-navigation/native';
+import LoadingScreen from './LoadingScreen';
+
+const auth = getAuth(app);
+const firestore = getFirestore(app);
 
 const Login = () => {
   const navigation = useNavigation(); // Get navigation object
@@ -18,42 +32,40 @@ const Login = () => {
 
   const handleLogin = () => {
     setLoading(true);
-    auth
-      .signInWithEmailAndPassword(inputs.email, inputs.password)
-      .then(userCredential => {
-        const user = userCredential.user;
 
-        firestore
-          .collection('users')
-          .doc(user.uid)
-          .get()
-          .then(doc => {
-            if (doc.exists) {
-              const userData = doc.data();
-              if (userData.isFinder) {
-                AsyncStorage.setItem('userType', 'finder');
-                setLoading(false);
-                AsyncStorage.setItem('loginStatus', 'true');
-                ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
-                navigation.navigate('FinderHomeScreen');
-              } else if (userData.isDonor) {
-                AsyncStorage.setItem('loginStatus', 'true');
-                AsyncStorage.setItem('userType', 'donor');
-                setLoading(false);
-                ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
-                navigation.navigate('DonorHomeScreen');
-              } else {
-                setError('Invalid user type');
-              }
+    signInWithEmailAndPassword(auth, inputs.email, inputs.password)
+      .then(async userCredential => {
+        const user = userCredential.user;
+        try {
+          const docRef = doc(firestore, 'users', user.uid);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            if (userData.isFinder) {
+              
+            
+              setLoading(false);
+              ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
+              navigation.navigate('FinderHomeScreen');
+            } else if (userData.isDonor) {
+             
+              setLoading(false);
+              ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
+              navigation.navigate('DonorHomeScreen');
             } else {
-              setError('User data not found');
+              setError('Invalid user type');
             }
-          })
-          .catch(error => {
-            setError('An error occurred');
-          });
+          } else {
+            setError('User data not found');
+          }
+        } catch (error) {
+          console.error('Error getting user document:', error);
+          setError('An error occurred');
+        }
       })
       .catch(error => {
+        console.error('Firebase authentication error:', error);
         setError('Incorrect email or password');
       })
       .finally(() => {
@@ -61,32 +73,29 @@ const Login = () => {
       });
   };
 
-  const handleOnchange = (text, input) => {
-    setInputs(prevState => ({...prevState, [input]: text}));
+  const handleOnChange = (text, input) => {
+    setInputs(prevState => ({ ...prevState, [input]: text }));
     setError(null);
   };
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
-    <SafeAreaView style={{backgroundColor: Colours.white, flex: 1}}>
-      <ScrollView contentContainerStyle={{paddingTop: 50, paddingHorizontal: 20}}>
-        <Text
-          style={{
-            color: Colours.black,
-            fontSize: 40,
-            fontFamily: 'Outfit',
-            color: Colours.PRIMARY,
-          }}>
+    <SafeAreaView style={{ backgroundColor: Colours.white, flex: 1 }}>
+      <ScrollView contentContainerStyle={{ paddingTop: 50, paddingHorizontal: 20 }}>
+        <Text style={{ color: Colours.black, fontSize: 40, fontFamily: 'Outfit', color: Colours.PRIMARY }}>
           Login
         </Text>
-        <View style={{marginVertical: 20}}>
+        <View style={{ marginVertical: 20 }}>
           <Input
-            onChangeText={text => handleOnchange(text, 'email')}
+            onChangeText={text => handleOnChange(text, 'email')}
             iconName="email-outline"
             label="Email"
             placeholder="Enter your email address"
           />
           <Input
-            onChangeText={text => handleOnchange(text, 'password')}
+            onChangeText={text => handleOnChange(text, 'password')}
             iconName="lock-outline"
             label="Password"
             placeholder="Enter your password"
@@ -95,7 +104,7 @@ const Login = () => {
           <Button title="Login" onPress={handleLogin} />
           {loading && (
             <ActivityIndicator
-              style={{marginTop: 20}}
+              style={{ marginTop: 20 }}
               size="large"
               color={Colours.PRIMARY}
             />

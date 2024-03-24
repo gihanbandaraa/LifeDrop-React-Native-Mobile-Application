@@ -1,10 +1,26 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
+import {useNavigation} from '@react-navigation/native';
 
 export default function Options() {
+  const navigation = useNavigation();
+
+  const AboutUs = () => {
+    navigation.navigate('AboutUs');
+  };
+  const NewsFeed = () => {
+    navigation.navigate('NewsFeed');
+  };
+  const Search = () => {
+    navigation.navigate('Search');
+  };
+  const Chats = () => {
+    navigation.navigate('Chats');
+  };
+
   return (
     <>
-      <View style={{marginTop:40}}>
+      <View style={{marginTop: 40}}>
         <View
           style={{
             flexDirection: 'row',
@@ -13,7 +29,7 @@ export default function Options() {
           }}>
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={Search}>
                 <Text style={styles.optionText}>Find Donor</Text>
                 <Image
                   source={require('../images/blood-bag.png')}
@@ -25,7 +41,7 @@ export default function Options() {
 
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={NewsFeed}>
                 <Text style={styles.optionText}>News Feed</Text>
                 <Image
                   source={require('../images/post.png')}
@@ -43,7 +59,7 @@ export default function Options() {
           }}>
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={Chats}>
                 <Text style={styles.optionText}>Chats</Text>
                 <Image
                   source={require('../images/chat.png')}
@@ -55,8 +71,8 @@ export default function Options() {
 
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
-                <Text style={styles.optionText}>About Us</Text>
+              <TouchableOpacity onPress={AboutUs}>
+                <Text style={styles.optionText}>About LifeDrop</Text>
                 <Image
                   source={require('../images/file.png')}
                   style={styles.image}
@@ -91,7 +107,8 @@ const styles = StyleSheet.create({
   optionText: {
     fontFamily: 'Outfit',
     alignSelf: 'center',
-    fontSize: 18,
+    fontSize: 20,
+    color:'black'
   },
   elevatedCard: {
     elevation: 3,

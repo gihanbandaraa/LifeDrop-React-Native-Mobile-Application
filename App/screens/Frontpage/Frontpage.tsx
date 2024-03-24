@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colours from '../../colours/Colours';
 
 interface FrontPageProps {}
@@ -9,29 +8,6 @@ interface FrontPageProps {}
 const FrontPage: React.FC<FrontPageProps> = () => {
   const navigation = useNavigation(); // Get navigation object
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    checkUserTypeAndLoginStatus();
-  }, []);
-
-  const checkUserTypeAndLoginStatus = async () => {
-    try {
-      const userType = await AsyncStorage.getItem('userType');
-      const loginStatus = await AsyncStorage.getItem('loginStatus');
-      // Check userType and loginStatus and navigate accordingly
-      if (loginStatus === 'true') {
-        if (userType === 'finder') {
-          navigation.navigate('FinderHomeScreen');
-        } else if (userType === 'donor') {
-          navigation.navigate('DonorHomeScreen');
-        }
-      }
-    } catch (error) {
-      console.error('Error checking user type and login status:', error);
-    } finally {
-      setIsLoading(false); // Set loading to false once navigation is performed
-    }
-  };
 
   const continueAsDonour = () => {
     navigation.navigate('DonorRegisterScreen'); // Navigate to DonourLogin screen
@@ -66,9 +42,8 @@ const FrontPage: React.FC<FrontPageProps> = () => {
           onPress={() => navigation.navigate('Login')}
           style={{
             color: Colours.black,
-            fontWeight: 'bold',
             textAlign: 'center',
-            fontFamily: 'outfit-bold',
+            fontFamily: 'Outfit',
             fontSize: 16,
             marginTop: 10,
           }}
