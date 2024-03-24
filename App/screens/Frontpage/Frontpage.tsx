@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colours from '../../colours/Colours';
 
 interface FrontPageProps {}
