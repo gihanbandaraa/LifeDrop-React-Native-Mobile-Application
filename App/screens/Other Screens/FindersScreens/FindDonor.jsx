@@ -118,44 +118,70 @@ export default function FindDonor() {
   const handleChat = async donorEmail => {
     try {
       const currentUser = auth.currentUser;
-      const querySnapshot = await getDocs(collection(firestore, 'users'));
-      let donorId;
-      querySnapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.email === donorEmail) {
-          donorId = doc.id;
-          return;
-        }
-      });
 
-      const chatRoomsRef = collection(firestore, 'chatRooms');
-      const chatRoomQuerySnapshot = await getDocs(chatRoomsRef);
-      let existingChatRoomId;
+      // Find the donorId based on donorEmail
+      const donorId = await getDonorIdByEmail(donorEmail);
 
-      chatRoomQuerySnapshot.forEach(doc => {
-        const chatRoomData = doc.data();
-        const users = chatRoomData.users;
-        if (users.includes(currentUser.uid) && users.includes(donorId)) {
-          existingChatRoomId = doc.id;
-          return;
-        }
-      });
+      if (!donorId) {
+        console.log('Donor with email', donorEmail, 'not found');
+        return;
+      }
+
+      // Check if there's an existing chat room
+      const existingChatRoomId = await findExistingChatRoom(
+        currentUser.uid,
+        donorId,
+      );
 
       if (existingChatRoomId) {
         console.log('Existing chat room found:', existingChatRoomId);
-        navigation.navigate('Chats');
       } else {
-        const newChatRoomRef = await addDoc(chatRoomsRef, {
-          users: [currentUser.uid, donorId],
-          createdAt: serverTimestamp(),
-        });
-        const newChatRoomId = newChatRoomRef.id;
+        // Create a new chat room if no existing one found
+        const newChatRoomId = await createNewChatRoom(currentUser.uid, donorId);
         console.log('New chat room created:', newChatRoomId);
-        navigation.navigate('Chats');
       }
+
+      // Navigate to the Chats screen
+      navigation.navigate('Chats');
     } catch (error) {
       console.error('Error handling chat:', error);
     }
+  };
+
+  // Function to find the donorId based on the donorEmail
+  const getDonorIdByEmail = async donorEmail => {
+    const querySnapshot = await getDocs(collection(firestore, 'users'));
+    for (const doc of querySnapshot.docs) {
+      const data = doc.data();
+      if (data.email === donorEmail) {
+        return doc.id;
+      }
+    }
+    return null; // Donor not found
+  };
+
+  // Function to find an existing chat room between currentUser and donorId
+  const findExistingChatRoom = async (currentUserUid, donorId) => {
+    const chatRoomsRef = collection(firestore, 'chatRooms');
+    const querySnapshot = await getDocs(chatRoomsRef);
+    for (const doc of querySnapshot.docs) {
+      const chatRoomData = doc.data();
+      const users = chatRoomData.users;
+      if (users.includes(currentUserUid) && users.includes(donorId)) {
+        return doc.id;
+      }
+    }
+    return null; // No existing chat room found
+  };
+
+  // Function to create a new chat room between currentUser and donorId
+  const createNewChatRoom = async (currentUserUid, donorId) => {
+    const chatRoomsRef = collection(firestore, 'chatRooms');
+    const newChatRoomRef = await addDoc(chatRoomsRef, {
+      users: [currentUserUid, donorId],
+      createdAt: serverTimestamp(),
+    });
+    return newChatRoomRef.id;
   };
 
   const filteredDonors = donors.filter(
@@ -173,13 +199,14 @@ export default function FindDonor() {
     'Seeking blood donation for medical emergency',
     'Blood donation request for critical situation',
   ];
-  
-  const randomMessage = randomMessages[Math.floor(Math.random() * randomMessages.length)];
-  
+
+  const randomMessage =
+    randomMessages[Math.floor(Math.random() * randomMessages.length)];
+
   const handleBloodRequest = async donorEmail => {
     try {
       const currentUser = auth.currentUser;
-  
+
       // Retrieve donor's ID
       const querySnapshot = await getDocs(collection(firestore, 'users'));
       let donorId;
@@ -190,12 +217,12 @@ export default function FindDonor() {
           return;
         }
       });
-  
+
       if (!donorId) {
         console.error('Donor ID not found for the given email:', donorEmail);
         return;
       }
-  
+
       // Check if there's an existing request from the current user to this donor
       const bloodRequestsRef = collection(
         firestore,
@@ -206,27 +233,23 @@ export default function FindDonor() {
       const existingRequestQuerySnapshot = await getDocs(
         query(bloodRequestsRef, where('requesterId', '==', currentUser.uid)),
       );
-  
+
       if (!existingRequestQuerySnapshot.empty) {
         Alert.alert(
           'Duplicate Request',
           'You have already made a request to this donor.',
-          [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
-          { cancelable: false }
+          [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+          {cancelable: false},
         );
         return;
       }
-  
-      // Get the current user's document
-      const currentUserDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-      
-      // Extract the current user's data from the document
+
+      const currentUserDoc = await getDoc(
+        doc(firestore, 'users', currentUser.uid),
+      );
       const currentUserData = currentUserDoc.data();
-      
-      // Get the current user's phone number
       const currentUserPhoneNumber = currentUserData.phone;
-      
-  
+
       await addDoc(bloodRequestsRef, {
         message: randomMessage,
         requesterId: currentUser.uid,
@@ -237,17 +260,16 @@ export default function FindDonor() {
       Alert.alert(
         'Success',
         'Your blood request has been initiated successfully.',
-        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
-        { cancelable: false }
+        [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+        {cancelable: false},
       );
-  
+
       console.log('Blood request initiated and saved');
     } catch (error) {
       console.error('Error handling blood request:', error);
     }
   };
-  
-  
+
   if (loading) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -257,6 +279,7 @@ export default function FindDonor() {
   }
 
   return (
+    <>
     <View style={{flex: 1}}>
       {!isSearchActive && <Text style={styles.heading}>Find Donors</Text>}
       <View style={styles.searchContainer}>
@@ -264,6 +287,7 @@ export default function FindDonor() {
         <TextInput
           style={styles.searchInput}
           placeholder="Search by name, blood type, city, or district..."
+          placeholderTextColor={'black'}
           value={searchQuery}
           onChangeText={setSearchQuery}
           onFocus={() => setIsSearchActive(true)}
@@ -362,6 +386,8 @@ export default function FindDonor() {
         )}
       />
     </View>
+    <View style={{height:120}}></View>
+    </>
   );
 }
 
@@ -385,6 +411,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 10,
     paddingHorizontal: 10,
+
   },
   searchIcon: {
     marginRight: 10,
@@ -392,8 +419,8 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 40,
-    fontFamily: 'Outfit Regular',
-    fontWeight: 'bold',
+    fontFamily: 'Outfit',
+    color:'black',
   },
   text: {
     fontFamily: 'Outfit SemiBold',

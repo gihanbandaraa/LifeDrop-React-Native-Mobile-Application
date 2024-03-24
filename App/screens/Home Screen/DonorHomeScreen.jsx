@@ -29,9 +29,9 @@ export default function DonorHomeScreen() {
             source={require('../../images/Logo.png')}
             style={styles.logo}
           />
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Icon name="bell" color="red" size={40} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <GeolocationUpdater firestore={firestore} user={user} />
         <DonorOption />

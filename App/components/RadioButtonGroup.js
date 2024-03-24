@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity,useColorScheme  } from 'react-native';
 import COLORS from '../colours/Colours';
 
 const RadioButtonGroup = ({ label, options, selectedOption, onSelect, error }) => {
     const halfLength = Math.ceil(options.length / 2);
     const firstColumnOptions = options.slice(0, halfLength);
     const secondColumnOptions = options.slice(halfLength);
+    const colorScheme =useColorScheme();
   
     return (
       <View style={styles.container}>
@@ -14,7 +15,7 @@ const RadioButtonGroup = ({ label, options, selectedOption, onSelect, error }) =
           <View style={styles.column}>
             {firstColumnOptions.map((option) => (
               <View key={option} style={styles.option}>
-                <Text style={styles.optionText}>{option}</Text>
+                <Text style={[styles.optionText, { color: colorScheme === 'dark' ? COLORS.black : COLORS.black }]}>{option}</Text>
                 <TouchableOpacity
                   style={[
                     styles.radio,
@@ -29,7 +30,7 @@ const RadioButtonGroup = ({ label, options, selectedOption, onSelect, error }) =
           <View style={styles.column}>
             {secondColumnOptions.map((option) => (
               <View key={option} style={styles.option}>
-                <Text style={styles.optionText}>{option}</Text>
+             <Text style={[styles.optionText, { color: colorScheme === 'dark' ? COLORS.black : COLORS.black }]}>{option}</Text>
                 <TouchableOpacity
                   style={[
                     styles.radio,
@@ -56,8 +57,8 @@ const RadioButtonGroup = ({ label, options, selectedOption, onSelect, error }) =
     label: {
       marginBottom: 5,
       fontSize: 14,
-      color: COLORS.grey,
-      fontFamily: 'outfit',
+      color: COLORS.BLACK,
+      fontFamily: 'Outfit',
     },
     optionsContainer: {
       flexDirection: 'row',
@@ -75,7 +76,8 @@ const RadioButtonGroup = ({ label, options, selectedOption, onSelect, error }) =
     },
     optionText: {
       marginRight: 10,
-      fontFamily: 'outfit-medium',
+      fontFamily: 'Outfit Regular',
+      color:COLORS.black
     },
     radio: {
       width: 25,

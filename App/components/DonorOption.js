@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit',
     alignSelf: 'center',
     fontSize: 18,
+    color:'black'
   },
   elevatedCard: {
     elevation: 3,

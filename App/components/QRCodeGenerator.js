@@ -78,7 +78,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginVertical: 5,
-    fontFamily:"Outfit Regular"
+    fontFamily:"Outfit Regular",
+    color:'black'
   },
 });
 

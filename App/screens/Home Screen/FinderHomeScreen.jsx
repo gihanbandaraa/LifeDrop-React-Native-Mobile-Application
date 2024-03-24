@@ -22,9 +22,9 @@ export default function FinderHomeScreen() {
             source={require('../../images/Logo.png')}
             style={styles.logo}
           />
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Icon name="bell" color="red" size={40} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <Options />
       </ScrollView>

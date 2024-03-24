@@ -100,12 +100,14 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: 'Outfit',
     fontSize: 18,
+    color:'black'
   },
   userData: {
     fontFamily: 'Outfit',
     fontSize: 16,
     marginLeft: 5,
     maxWidth: 200,
+    color:'black'
   },
   input: {
     fontFamily: 'Outfit',
@@ -121,10 +123,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit',
     fontSize: 20,
     marginBottom: 20,
+    color:'black'
   },
   modalInput: {
     borderWidth: 1,
     borderColor: 'black',
+    color:'black',
     borderRadius: 5,
     padding: 10,
     marginBottom: 20,

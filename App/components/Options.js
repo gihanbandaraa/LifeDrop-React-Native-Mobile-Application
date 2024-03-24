@@ -6,7 +6,7 @@ export default function Options() {
   const navigation = useNavigation();
 
   const AboutUs = () => {
-    navigation.navigate('About Us');
+    navigation.navigate('AboutUs');
   };
   const NewsFeed = () => {
     navigation.navigate('NewsFeed');
@@ -71,7 +71,7 @@ export default function Options() {
 
           <View style={[styles.optionContainer, styles.elevatedCard]}>
             <View style={styles.option}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={AboutUs}>
                 <Text style={styles.optionText}>About LifeDrop</Text>
                 <Image
                   source={require('../images/file.png')}
@@ -107,7 +107,8 @@ const styles = StyleSheet.create({
   optionText: {
     fontFamily: 'Outfit',
     alignSelf: 'center',
-    fontSize: 18,
+    fontSize: 20,
+    color:'black'
   },
   elevatedCard: {
     elevation: 3,

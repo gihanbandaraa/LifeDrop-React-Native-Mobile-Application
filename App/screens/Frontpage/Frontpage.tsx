@@ -43,9 +43,8 @@ const FrontPage: React.FC<FrontPageProps> = () => {
           onPress={() => navigation.navigate('Login')}
           style={{
             color: Colours.black,
-            fontWeight: 'bold',
             textAlign: 'center',
-            fontFamily: 'outfit-bold',
+            fontFamily: 'Outfit',
             fontSize: 16,
             marginTop: 10,
           }}

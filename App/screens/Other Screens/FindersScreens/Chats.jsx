@@ -14,71 +14,63 @@ import {
   where,
   getDoc,
   doc,
+  deleteDoc,
 } from 'firebase/firestore';
 import {getAuth} from 'firebase/auth';
 import {getFirestore} from 'firebase/firestore';
 import app from '../../../../firebaseConfig';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Image } from 'react-native';
+import {Image} from 'react-native';
+import {Alert} from 'react-native';
 
 // Assuming you have initialized Firebase in a file called firebase.js
 const firebaseApp = app;
 const firestore = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
 
+
 export default function Chats() {
   const [chats, setChats] = useState([]);
-  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
+
 
   useEffect(() => {
     const fetchChats = async () => {
       try {
         const currentUser = auth.currentUser;
-        console.log('Current User:', currentUser);
-
         const chatRoomsRef = collection(firestore, 'chatRooms');
         const q = query(
           chatRoomsRef,
           where('users', 'array-contains', currentUser.uid),
         );
-        console.log('Query:', q);
 
         const querySnapshot = await getDocs(q);
-        console.log('Query Snapshot:', querySnapshot);
 
         const chatsData = [];
         for (const chatRoomDoc of querySnapshot.docs) {
-          console.log('Processing document:', chatRoomDoc.id);
           const chatRoomData = chatRoomDoc.data();
-          console.log('Chat Room Data:', chatRoomData);
           const donorId = chatRoomData.users.find(id => id !== currentUser.uid);
-          console.log('Donor ID:', donorId);
 
-          // Retrieve the user document from 'users' collection using the document path
           const donorDocSnapshot = await getDoc(
             doc(firestore, `users/${donorId}`),
-          ); // Using document path
-          console.log('Donor Document Snapshot:', donorDocSnapshot);
+          );
 
           if (donorDocSnapshot.exists()) {
             const donorData = donorDocSnapshot.data();
-            console.log('Donor Data:', donorData);
             chatsData.push({
               chatRoomId: chatRoomDoc.id,
               currentUserId: currentUser.uid,
               donorId,
-              donorName: donorData.fullname, 
+              donorName: donorData.fullname,
               donorProfileImage: donorData.profileImage,
-              // Assuming the donor's name is stored in the 'fullname' field
             });
           } else {
             console.log('Donor document does not exist for donorId:', donorId);
           }
         }
 
-        console.log('Chats Data:', chatsData);
         setChats(chatsData);
         setLoading(false);
       } catch (error) {
@@ -87,6 +79,12 @@ export default function Chats() {
     };
 
     fetchChats();
+    const interval = setInterval(() => {
+      fetchChats();
+    }, 1000);
+
+    // Clear interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const handleChatPress = (chatRoomId, donorId, donorName) => {
@@ -95,13 +93,50 @@ export default function Chats() {
       otherUserId: donorId,
       otherUserName: donorName,
       currentUserId: auth.currentUser.uid,
-      
     });
   };
+
+  const handleDeleteChat = chatRoomId => {
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to delete this chat?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(firestore, 'chatRooms', chatRoomId));
+              // Remove the deleted chat from the state
+              setChats(prevChats =>
+                prevChats.filter(chat => chat.chatRoomId !== chatRoomId),
+              );
+              console.log('Chat room deleted successfully');
+            } catch (error) {
+              console.error('Error deleting chat room:', error);
+            }
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="red" />
+      </View>
+    );
+  }
+
+  if (chats.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.noChatsText}>No chats available</Text>
       </View>
     );
   }
@@ -126,6 +161,11 @@ export default function Chats() {
                 <Ionicons name="person" size={50} color={'black'} />
               )}
               <Text style={styles.chatItemText}>{item.donorName}</Text>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDeleteChat(item.chatRoomId)}>
+                <Ionicons name="trash" size={20} color={'red'} />
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}
@@ -140,6 +180,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'left',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   heading: {
     alignSelf: 'center',
@@ -167,5 +212,13 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 10,
+  },
+  noChatsText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: 'black',
+  },
+  deleteButton: {
+    marginLeft: 'auto',
   },
 });

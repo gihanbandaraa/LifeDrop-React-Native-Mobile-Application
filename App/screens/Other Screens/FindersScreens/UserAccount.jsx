@@ -355,11 +355,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Outfit',
     marginBottom: 20,
+    color:'black'
   },
   modalInput: {
     width: '80%',
     height: 40,
     borderColor: 'gray',
+    color:'black',
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,

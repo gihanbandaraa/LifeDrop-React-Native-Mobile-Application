@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
-import { collection, query, getDocs, getFirestore, where, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import { collection, query, getDocs, getFirestore, where, onSnapshot, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import app from '../../../../firebaseConfig'; // Import your Firebase configuration
 import { getAuth } from 'firebase/auth';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -26,7 +26,7 @@ export default function DonorBloodRequest() {
           snapshot.forEach(doc => {
             const data = doc.data();
             const { message, requesterId, requesterPhoneNumber } = data;
-            bloodRequestsData.push({ message, requesterId, requesterPhoneNumber });
+            bloodRequestsData.push({ id: doc.id, message, requesterId, requesterPhoneNumber });
           });
           setBloodRequests(bloodRequestsData);
           setLoading(false); // Set loading to false once data is fetched
@@ -76,6 +76,15 @@ export default function DonorBloodRequest() {
 
   const handleEmail = email => {
     Linking.openURL(`mailto:${email}`);
+  };
+
+  const handleDelete = async requestId => {
+    try {
+      await deleteDoc(doc(firestore, 'users', auth.currentUser.uid, 'bloodRequests', requestId));
+      console.log('Blood donation request deleted successfully');
+    } catch (error) {
+      console.error('Error deleting blood donation request:', error);
+    }
   };
 
   return (
@@ -134,6 +143,9 @@ export default function DonorBloodRequest() {
                     </TouchableOpacity>
                   </View>
                 </View>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(request.id)}>
+                  <Icon name="trash" size={20} color="red" />
+                </TouchableOpacity>
               </View>
             ))
           )}
@@ -158,24 +170,27 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
     textAlign: 'center',
-    fontFamily:'Outfit'
+    fontFamily:'Outfit',
+    color:'black'
   },
   noRequests: {
     fontSize: 18,
     textAlign: 'center',
+    color:'black'
   },
   requestContainer: {
     marginBottom: 20,
     padding: 10,
     backgroundColor: '#f9f9f9',
     borderRadius: 5,
-    elevation:3
+    elevation:3,
   },
   message: {
     fontSize: 16,
     marginBottom: 10,
     fontFamily: 'Outfit',
-    color:'black'
+    color:'black',
+
   },
   detailsContainer: {
     flexDirection: 'row',
@@ -194,9 +209,13 @@ const styles = StyleSheet.create({
   detailText: {
     marginBottom: 5,
     fontFamily: 'Outfit Regular',
+    color:'black'
   },
   phoneNumber: {
     fontSize: 16,
     color: '#2ecc71',
+  },
+  deleteButton: {
+    marginLeft: 10,
   },
 });

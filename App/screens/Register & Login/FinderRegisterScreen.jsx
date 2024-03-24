@@ -257,15 +257,20 @@ const FinderRegisterScreen = ({navigation}) => {
           <View style={{marginBottom: 20}}>
             <Text
               style={{
-                color: Colours.GRAY,
-                marginBottom: 5,
+                color: Colours.black,
+                marginBottom: 8,
                 fontFamily: 'Outfit',
               }}>
               District
             </Text>
             <Picker
               selectedValue={inputs.district}
-              style={{height: 50, width: '100%', fontFamily: 'Outfit'}}
+              style={{
+                height: 50,
+                width: '100%',
+                fontFamily: 'Outfit',
+                color: 'black',
+              }}
               onValueChange={(itemValue, itemIndex) =>
                 handleOnchange(itemValue, 'district')
               }>
@@ -314,7 +319,8 @@ const FinderRegisterScreen = ({navigation}) => {
               onPress={() => setPrivacyPermission(!privacyPermission)}
             />
 
-            <Text style={{marginLeft: 10, fontFamily: 'Outfit'}}>
+            <Text
+              style={{marginLeft: 10, fontFamily: 'Outfit', color: 'black'}}>
               Allow Privacy Permissions
             </Text>
             <TouchableOpacity
@@ -324,7 +330,6 @@ const FinderRegisterScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
 
-          {/* Terms & Conditions */}
           <View
             style={{
               flexDirection: 'row',
@@ -336,7 +341,8 @@ const FinderRegisterScreen = ({navigation}) => {
               checked={termsAndConditions}
               onPress={() => setTermsAndConditions(!termsAndConditions)}
             />
-            <Text style={{marginLeft: 10, fontFamily: 'Outfit'}}>
+            <Text
+              style={{marginLeft: 10, fontFamily: 'Outfit', color: 'black'}}>
               Agree to Terms & Conditions
             </Text>
             <TouchableOpacity

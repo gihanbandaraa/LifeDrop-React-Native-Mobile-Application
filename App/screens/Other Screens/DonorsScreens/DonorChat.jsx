@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  Alert,
 } from 'react-native';
 import {
   collection,
@@ -15,6 +16,7 @@ import {
   where,
   getDoc,
   doc,
+  deleteDoc,
 } from 'firebase/firestore';
 import {getAuth} from 'firebase/auth';
 import {getFirestore} from 'firebase/firestore';
@@ -89,9 +91,42 @@ export default function DonorChats() {
         console.error('Error fetching chats:', error);
       }
     };
-
     fetchChats();
+    const interval = setInterval(() => {
+      fetchChats();
+    }, 1000);
+
+    // Clear interval on component unmount
+    return () => clearInterval(interval);
   }, []);
+
+  const handleDeleteChat = chatRoomId => {
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to delete this chat?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(firestore, 'chatRooms', chatRoomId));
+              setChats(prevChats =>
+                prevChats.filter(chat => chat.chatRoomId !== chatRoomId),
+              );
+              console.log('Chat room deleted successfully');
+            } catch (error) {
+              console.error('Error deleting chat room:', error);
+            }
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
 
   const handleChatPress = (
     chatRoomId,
@@ -112,6 +147,14 @@ export default function DonorChats() {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="red" />
+      </View>
+    );
+  }
+
+  if (chats.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.noChatsText}>No chats available</Text>
       </View>
     );
   }
@@ -141,6 +184,11 @@ export default function DonorChats() {
                 <Ionicons name="person" size={50} color={'black'} />
               )}
               <Text style={styles.chatItemText}>{item.otherUserName}</Text>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDeleteChat(item.chatRoomId)}>
+                <Ionicons name="trash" size={20} color="red" />
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}
@@ -182,5 +230,13 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 10,
+  },
+  noChatsText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: 'black',
+  },
+  deleteButton: {
+    marginLeft: 'auto',
   },
 });

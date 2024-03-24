@@ -7,6 +7,7 @@ import FindDonor from '../screens/Other Screens/FindersScreens/FindDonor';
 import NewsFeed from '../screens/Other Screens/FindersScreens/NewsFeed';
 import UserAccount from '../screens/Other Screens/FindersScreens/UserAccount';
 import Chats from '../screens/Other Screens/FindersScreens/Chats';
+import AboutUs from '../screens/Other Screens/AboutUs';
 import { createStackNavigator } from '@react-navigation/stack';
 import MessageRoom from '../screens/Other Screens/MessageRoom';
 const Tab = createBottomTabNavigator();
@@ -21,6 +22,11 @@ export default function FinderStack() {
         <Stack.Screen
           name="MessageRoom"
           component={MessageRoom}
+
+        />
+        <Stack.Screen
+          name="AboutUs"
+          component={AboutUs}
 
         />
       </Stack.Navigator>

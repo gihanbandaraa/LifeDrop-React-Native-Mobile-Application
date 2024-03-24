@@ -25,6 +25,7 @@ export default function AppMapView({ donors, initialRegion }) {
             }}
             title={donor.name}
             description={`${donor.city}, ${donor.district}`}
+            
           />
         ))}
       </MapView>
@@ -42,5 +43,14 @@ const styles = StyleSheet.create({
     height: Dimensions.get('screen').height * 0.23,
     marginHorizontal: 20,
     marginVertical: 10,
+  },
+  customMarkerContainer: {
+    backgroundColor: 'rgba(255, 0, 0, 0.7)',
+    padding: 5,
+    borderRadius: 10,
+  },
+  customMarkerText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

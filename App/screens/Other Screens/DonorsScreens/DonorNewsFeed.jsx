@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, ActivityIndicator, Linking, TouchableOpacity } from 'react-native';
-import { getFirestore, collection, onSnapshot, query } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import React, {useState, useEffect} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TextInput,
+  ActivityIndicator,
+  Linking,
+  TouchableOpacity,
+} from 'react-native';
+import {getFirestore, collection, onSnapshot, query} from 'firebase/firestore';
+import {getAuth} from 'firebase/auth';
 import app from '../../../../firebaseConfig';
-import { ScrollView } from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import MaterialIcons from react-native-vector-icons
-
 
 export default function DonorNewsFeed() {
   const firebaseApp = app;
@@ -23,7 +31,7 @@ export default function DonorNewsFeed() {
         const campaignsData = [];
         snapshot.forEach(doc => {
           const id = doc.id || Math.random().toString(36).substring(7);
-          campaignsData.push({ id, ...doc.data() });
+          campaignsData.push({id, ...doc.data()});
         });
         setCampaigns(campaignsData);
         setLoading(false);
@@ -51,7 +59,7 @@ export default function DonorNewsFeed() {
     );
   });
 
-  const getDirections = (campaign) => {
+  const getDirections = campaign => {
     if (campaign && campaign.venue) {
       const venue = encodeURIComponent(campaign.venue + ', ' + campaign.city);
       console.log(venue);
@@ -82,28 +90,31 @@ export default function DonorNewsFeed() {
           filteredCampaigns.map(campaign => (
             <View key={campaign.id} style={styles.campaignContainer}>
               <Image
-                source={{ uri: campaign.imageUrl }}
+                source={{uri: campaign.imageUrl}}
                 style={styles.bannerImage}
               />
               <Text style={styles.title}>{campaign.name}</Text>
-              <Text style={styles.details}>
-                {campaign.venue}, {campaign.city}
-              </Text>
-              <Text style={[styles.details, styles.timeAndDate]}>
-                {campaign.date}, {campaign.time}
-              </Text>
+              {campaign.type !== 'Post' && ( // Check if type is not 'post'
+                <View>
+                  <Text style={styles.details}>
+                    {campaign.venue}, {campaign.city}
+                  </Text>
+                  <Text style={[styles.details, styles.timeAndDate]}>
+                    {campaign.date}, {campaign.time}
+                  </Text>
+                </View>
+              )}
               <Text style={styles.description}>{campaign.description}</Text>
-
-     
-              <View style={styles.buttons}>
-                <TouchableOpacity onPress={() => getDirections(campaign)}>
-                  <View style={styles.button}>
-                    <Icon name="directions" size={20} color="white" />
-                    <Text style={styles.buttonText}>Get Directions</Text>
-                  </View>
-                </TouchableOpacity>
-
-              </View>
+              {campaign.type !== 'Post' && ( // Check if type is not 'post'
+                <View style={styles.buttons}>
+                  <TouchableOpacity onPress={() => getDirections(campaign)}>
+                    <View style={styles.button}>
+                      <Icon name="directions" size={20} color="white" />
+                      <Text style={styles.buttonText}>Get Directions</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           ))
         )}
@@ -125,8 +136,10 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 10,
+    color:'black',
     marginBottom: 20,
     paddingLeft: 10,
+    fontFamily:'Outfit'
   },
   campaignContainer: {
     marginBottom: 20,
@@ -137,7 +150,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   bannerImage: {
-    width: "100%",
+    width: '100%',
     height: 400,
     borderRadius: 10,
     marginBottom: 10,
@@ -146,19 +159,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 5,
     fontFamily: 'Outfit',
-    color: 'black'
+    color: 'black',
   },
   details: {
     fontSize: 18,
     marginBottom: 5,
-    fontFamily: 'Outfit Regular'
+    fontFamily: 'Outfit Regular',
   },
   description: {
     fontSize: 14,
-    fontFamily: 'Outfit Regular'
+    fontFamily: 'Outfit Regular',
   },
   timeAndDate: {
-    color: '#00b894'
+    color: '#00b894',
   },
   buttons: {
     flexDirection: 'row',

@@ -11,7 +11,7 @@ const QRModal = ({ visible, onClose, userData }) => {
       onRequestClose={onClose}>
       <TouchableOpacity style={styles.modalOverlay} onPress={onClose}>
         <View style={styles.modalContent}>
-          {generateQRCode(userData)}
+           {generateQRCode(userData, styles.qrCodeText)}
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
@@ -33,12 +33,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
+    color:'black'
   },
   closeButton: {
     marginTop: 20,
   },
   closeButtonText: {
-    color: 'blue',
+    color: 'red',
     fontSize: 18,
     fontFamily:'Outfit'
   },

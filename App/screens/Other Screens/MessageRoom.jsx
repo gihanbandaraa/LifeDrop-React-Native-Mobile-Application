@@ -53,9 +53,8 @@ export default function MessageRoom({route}) {
   }, [chatRoomId]);
 
   const sendMessage = async () => {
-    // Check if the new message is empty
+    
     if (newMessage.trim() === '') {
-      // Display an alert or handle the empty message case accordingly
       console.warn('Cannot send empty message');
       return;
     }
@@ -97,7 +96,7 @@ export default function MessageRoom({route}) {
           alignItems: 'center',
         }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="caret-back-outline" color={'red'} size={30} />
+          <Ionicons name="caret-back-outline" color={'red'} size={50} />
         </TouchableOpacity>
         <Text style={styles.userName}>{otherUserName}</Text>
       </View>
@@ -125,6 +124,7 @@ export default function MessageRoom({route}) {
           value={newMessage}
           onChangeText={text => setNewMessage(text)}
           placeholder="Type a message..."
+          placeholderTextColor={'black'} 
         />
         <Button title="Send" onPress={sendMessage} />
       </View>
@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 20,
     fontFamily: 'Outfit',
+    color:'black'
   },
   header: {
     padding: 20,
@@ -183,10 +184,12 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     marginVertical: 5,
+    color:'black',
     paddingHorizontal: 10,
     marginRight: 10,
     backgroundColor: '#f9f9f9',
-    fontFamily: 'Outfit', // Background color for the input field
+    fontFamily: 'Outfit', 
+    
   },
   sendButton: {
     backgroundColor: 'red', // Example color for the send button
@@ -200,5 +203,6 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontFamily: 'Outfit',
+    color:'black'
   },
 });

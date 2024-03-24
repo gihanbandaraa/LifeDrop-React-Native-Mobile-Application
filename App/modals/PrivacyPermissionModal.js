@@ -47,14 +47,15 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
     marginBottom: 10,
     fontFamily: 'Outfit',
+    color:'black'
   },
   modalText: {
     marginBottom: 20,
     textAlign: 'center',
     fontFamily: 'Outfit Regular',
+    color:'black'
   },
 });
 

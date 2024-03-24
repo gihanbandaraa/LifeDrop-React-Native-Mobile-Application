@@ -9,6 +9,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  useColorScheme
 } from 'react-native';
 
 //import Firebase
@@ -74,6 +75,7 @@ const DonorRegisterScreen = ({navigation}) => {
   const [termsAndConditions, setTermsAndConditions] = useState(false);
   const [privacyModalVisible, setPrivacyModalVisible] = useState(false);
   const [termsModalVisible, settermsModalVisible] = useState(false);
+  const colorScheme = useColorScheme();
 
   const handlePrivacyIconPress = () => {
     setPrivacyModalVisible(true);
@@ -222,7 +224,6 @@ const DonorRegisterScreen = ({navigation}) => {
         contentContainerStyle={{paddingTop: 50, paddingHorizontal: 20}}>
         <Text
           style={{
-            color: Colours.black,
             fontSize: 40,
             fontFamily: 'Outfit',
             color: Colours.PRIMARY,
@@ -231,7 +232,7 @@ const DonorRegisterScreen = ({navigation}) => {
         </Text>
         <Text
           style={{
-            color: Colours.GRAY,
+            color: colorScheme === 'dark' ? Colours.black : Colours.GRAY,
             fontSize: 18,
             marginVertical: 10,
             fontFamily: 'Outfit Medium',
@@ -279,7 +280,7 @@ const DonorRegisterScreen = ({navigation}) => {
           <View style={{marginBottom: 20}}>
             <Text
               style={{
-                color: Colours.GRAY,
+                color: Colours.black,
                 marginBottom: 5,
                 fontFamily: 'Outfit',
               }}>
@@ -287,13 +288,12 @@ const DonorRegisterScreen = ({navigation}) => {
             </Text>
             <Picker
               selectedValue={selectedDistrict}
-              style={{height: 50, width: '100%', fontFamily: 'outfit'}}
               onValueChange={(itemValue, itemIndex) =>
                 setSelectedDistrict(itemValue)
               }>
-              <Picker.Item label="Select district" value="" />
+              <Picker.Item label="Select district" value=""   color={colorScheme === 'dark' ? Colours.black : Colours.black}/>
               {sriLankanDistricts.map((district, index) => (
-                <Picker.Item key={index} label={district} value={district} />
+                <Picker.Item key={index} label={district} value={district} color={colorScheme === 'dark' ? Colours.black : Colours.GRAY}/>
               ))}
             </Picker>
             {errors.district && (
@@ -307,7 +307,7 @@ const DonorRegisterScreen = ({navigation}) => {
             selectedOption={selectedBloodType}
             onSelect={setSelectedBloodType}
             error={errors.bloodType}
-            p
+            
           />
           <RadioButtonGroup
             label="Select Gender"
@@ -344,7 +344,7 @@ const DonorRegisterScreen = ({navigation}) => {
               onPress={() => setPrivacyPermission(!privacyPermission)}
             />
 
-            <Text style={{marginLeft: 10, fontFamily: 'Outfit'}}>
+            <Text style={{marginLeft: 10, fontFamily: 'Outfit',color:'black'}}>
               Allow Privacy Permissions
             </Text>
             <TouchableOpacity
@@ -366,7 +366,7 @@ const DonorRegisterScreen = ({navigation}) => {
               checked={termsAndConditions}
               onPress={() => setTermsAndConditions(!termsAndConditions)}
             />
-            <Text style={{marginLeft: 10, fontFamily: 'Outfit'}}>
+            <Text style={{marginLeft: 10, fontFamily: 'Outfit',color:'black'}}>
               Agree to Terms & Conditions
             </Text>
             <TouchableOpacity
@@ -403,7 +403,6 @@ const DonorRegisterScreen = ({navigation}) => {
             onPress={() => navigation.navigate('Login')}
             style={{
               color: Colours.black,
-              fontWeight: 'bold',
               textAlign: 'center',
               fontFamily: 'Outfit',
               fontSize: 16,

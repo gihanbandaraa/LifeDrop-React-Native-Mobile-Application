@@ -75,7 +75,8 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily:'Outfit',
+    color:'black',
     marginBottom: 10,
   },
   scrollView: {
@@ -85,14 +86,19 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 20,
     textAlign: 'left',
+    fontFamily:'Outfit Regular',
+    color:'black',
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily:'Outfit Regular',
+    color:'black',
     marginTop: 10,
   },
   sectionContent: {
     fontSize: 14,
+    fontFamily:'Outfit Regular',
+    color:'black',
   },
 });
 
