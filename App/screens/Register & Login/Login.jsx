@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -9,13 +9,13 @@ import {
   ToastAndroid,
 } from 'react-native';
 
-import { getAuth, signInWithEmailAndPassword} from 'firebase/auth';
-import { getFirestore, collection, doc, getDoc } from 'firebase/firestore'; // Updated imports
+import {getAuth, signInWithEmailAndPassword} from 'firebase/auth';
+import {getFirestore, collection, doc, getDoc} from 'firebase/firestore'; // Updated imports
 import app from '../../../firebaseConfig';
 import Colours from '../../colours/Colours';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import LoadingScreen from './LoadingScreen';
 
 const auth = getAuth(app);
@@ -43,16 +43,11 @@ const Login = () => {
           if (docSnap.exists()) {
             const userData = docSnap.data();
             if (userData.isFinder) {
-              
-            
               setLoading(false);
-              ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
-              navigation.navigate('FinderHomeScreen');
+              ToastAndroid.show('Finder Login Successful', ToastAndroid.SHORT);
             } else if (userData.isDonor) {
-             
               setLoading(false);
-              ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
-              navigation.navigate('DonorHomeScreen');
+              ToastAndroid.show('Donor Login Successful', ToastAndroid.SHORT);
             } else {
               setError('Invalid user type');
             }
@@ -74,7 +69,7 @@ const Login = () => {
   };
 
   const handleOnChange = (text, input) => {
-    setInputs(prevState => ({ ...prevState, [input]: text }));
+    setInputs(prevState => ({...prevState, [input]: text}));
     setError(null);
   };
   if (loading) {
@@ -82,12 +77,19 @@ const Login = () => {
   }
 
   return (
-    <SafeAreaView style={{ backgroundColor: Colours.white, flex: 1 }}>
-      <ScrollView contentContainerStyle={{ paddingTop: 50, paddingHorizontal: 20 }}>
-        <Text style={{ color: Colours.black, fontSize: 40, fontFamily: 'Outfit', color: Colours.PRIMARY }}>
+    <SafeAreaView style={{backgroundColor: Colours.white, flex: 1}}>
+      <ScrollView
+        contentContainerStyle={{paddingTop: 50, paddingHorizontal: 20}}>
+        <Text
+          style={{
+            color: Colours.black,
+            fontSize: 40,
+            fontFamily: 'Outfit',
+            color: Colours.PRIMARY,
+          }}>
           Login
         </Text>
-        <View style={{ marginVertical: 20 }}>
+        <View style={{marginVertical: 20}}>
           <Input
             onChangeText={text => handleOnChange(text, 'email')}
             iconName="email-outline"
@@ -104,7 +106,7 @@ const Login = () => {
           <Button title="Login" onPress={handleLogin} />
           {loading && (
             <ActivityIndicator
-              style={{ marginTop: 20 }}
+              style={{marginTop: 20}}
               size="large"
               color={Colours.PRIMARY}
             />
