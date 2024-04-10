@@ -166,14 +166,14 @@ const DonorRegisterScreen = ({navigation}) => {
       );
       const user = userCredentials.user;
       console.log(user.email);
-
+  
       // Get current location
       Geolocation.getCurrentPosition(
         async position => {
           console.log(position);
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
-
+  
           try {
             await setDoc(doc(firestore, 'users', user.uid), {
               email: user.email,
@@ -191,6 +191,17 @@ const DonorRegisterScreen = ({navigation}) => {
               longitude: longitude,
             });
             console.log('User data added to Firestore successfully!');
+            Alert.alert(
+              'Registration Successful',
+              'Your account has been registered successfully!',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => navigation.navigate('Login'),
+                },
+              ],
+            );
+            setLoading(false); // Moved inside the try block
           } catch (error) {
             console.error('Error adding user data to Firestore: ', error);
             setLoading(false);
@@ -208,6 +219,7 @@ const DonorRegisterScreen = ({navigation}) => {
       Alert.alert('Error', error.message);
     }
   };
+  
 
   const handleOnchange = (text, input) => {
     setInputs(prevState => ({...prevState, [input]: text}));

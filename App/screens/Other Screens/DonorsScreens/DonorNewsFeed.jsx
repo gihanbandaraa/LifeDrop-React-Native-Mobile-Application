@@ -79,9 +79,10 @@ export default function DonorNewsFeed() {
     <ScrollView>
       <View style={styles.container}>
         <TextInput
-          style={styles.searchInput}
+          style={styles.searchInput} 
           placeholder="Search campaigns..."
           onChangeText={text => setSearchQuery(text)}
+          placeholderTextColor={'black'}
           value={searchQuery}
         />
         {loading ? (
@@ -139,7 +140,8 @@ const styles = StyleSheet.create({
     color:'black',
     marginBottom: 20,
     paddingLeft: 10,
-    fontFamily:'Outfit'
+    fontFamily:'Outfit',
+    color:'black'
   },
   campaignContainer: {
     marginBottom: 20,
@@ -165,10 +167,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 5,
     fontFamily: 'Outfit Regular',
+    color:'black'
   },
   description: {
     fontSize: 14,
     fontFamily: 'Outfit Regular',
+    color:'black'
   },
   timeAndDate: {
     color: '#00b894',

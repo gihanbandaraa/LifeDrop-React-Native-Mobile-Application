@@ -12,21 +12,23 @@ import {
   Modal,
   TextInput,
   Alert,
+  ToastAndroid,
 } from 'react-native';
-import {getAuth, onAuthStateChanged, signOut} from 'firebase/auth';
+import {deleteUser, getAuth, onAuthStateChanged, signOut} from 'firebase/auth';
 import {
   getFirestore,
   doc,
   getDoc,
   updateDoc,
   onSnapshot,
+  deleteDoc,
 } from 'firebase/firestore';
 import app from '../../../../firebaseConfig';
 import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import DetailsComponent from '../../../components/DetailsComponent';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as ImagePicker from 'react-native-image-picker'; // Import FontAwesome icon
-import {Button} from 'react-native-elements';
+
 
 const auth = getAuth(app);
 const firestore = getFirestore(app);
@@ -150,10 +152,14 @@ export default function UserAccount() {
           onPress: async () => {
             try {
               const user = auth.currentUser;
-              await deleteDoc(doc(firestore, 'users', user.uid)); // Delete user data from Firestore
-              await deleteUser(user); // Delete user account
+              // Delete user document from Firestore
+              await deleteDoc(doc(firestore, 'users', user.uid));
+              // Delete user account
+              await deleteUser(user);
               console.log('User account deleted successfully.');
-              signOut(auth); // Sign out the user
+              // Navigate to sign out the user (optional)
+              await signOut(auth);
+              ToastAndroid.show('Account Deleted Successfully', ToastAndroid.SHORT);
             } catch (error) {
               console.error('Error deleting user account:', error);
             }
@@ -161,10 +167,10 @@ export default function UserAccount() {
           style: 'destructive',
         },
       ],
-      {cancelable: false},
+      { cancelable: false }
     );
   };
-
+  
   if (loading) {
     return (
       <View style={[styles.loadingContainer, styles.horizontal]}>

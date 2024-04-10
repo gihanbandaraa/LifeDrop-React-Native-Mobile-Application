@@ -29,6 +29,11 @@ export default function FinderStack() {
           component={AboutUs}
 
         />
+        <Stack.Screen
+          name="FinderHomeScreen"
+          component={FinderHomeScreen}
+
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -106,6 +106,11 @@ export default function DonorStack() {
           component={MessageRoom}
 
         />
+        <Stack.Screen
+          name="DonorHomeScreen"
+          component={DonorHomeScreen}
+
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
